@@ -1,25 +1,25 @@
 package db
 
 import (
-	"github.com/artificial-universe-maker/shiva/models"
+	"github.com/artificial-universe-maker/go-utilities/models"
 	"github.com/go-gorp/gorp"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Required for sqlx postgres connections
 )
 
-// Shiva is the PostgreSQL connection instance
-var Shiva *sqlx.DB
+// Instance is the PostgreSQL connection instance
+var Instance *sqlx.DB
 var DBMap *gorp.DbMap
 
 // InitializeDB will setup the DB connection
 func InitializeDB() error {
 	var err error
-	Shiva, err = sqlx.Connect("postgres", "user=postgres dbname=postgres host=postgres sslmode=disable")
+	Instance, err = sqlx.Connect("postgres", "user=postgres dbname=postgres host=postgres sslmode=disable")
 	if err != nil {
 		return err
 	}
 
-	DBMap = &gorp.DbMap{Db: Shiva.DB, Dialect: gorp.PostgresDialect{}}
+	DBMap = &gorp.DbMap{Db: Instance.DB, Dialect: gorp.PostgresDialect{}}
 
 	DBMap.AddTableWithName(models.AumProject{}, "projects")
 	DBMap.AddTableWithName(models.AumZone{}, "zones")
