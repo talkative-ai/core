@@ -1,13 +1,26 @@
 package models
 
+// LBlock is the RawLBlock after action bundles have been built
 type LBlock struct {
 	AlwaysExec *uint64         `json:"always"`
 	Statements *[][]LStatement `json:"statements"`
 }
 
+// LStatement is the RawLStatement after action bundles have been built
 type LStatement struct {
 	Operators *OpArray `json:"conditions"`
-	Exec      []uint64 `json:"then"`
+	Exec      []int32
+}
+
+// LBlock contian
+type RawLBlock struct {
+	AlwaysExec *map[string]interface{} `json:"always"`
+	Statements *[][]RawLStatement      `json:"statements"`
+}
+
+type RawLStatement struct {
+	Operators *OpArray                 `json:"conditions"`
+	Exec      []map[string]interface{} `json:"then"`
 }
 
 type VarValMap map[int]interface{}
