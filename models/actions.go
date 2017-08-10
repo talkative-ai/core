@@ -1,20 +1,20 @@
 package models
 
 import (
-	"fmt"
+	"encoding/binary"
 	"net/url"
 
 	"github.com/artificial-universe-maker/go-ssml"
 )
 
-type AumActionID uint32
+type AumActionID uint64
 
 const (
-	SetGlobalVariables AumActionID = iota
-	PlaySounds
-	InitializeActorDialog
-	SetZone
-	ResetGame
+	AAIDSetGlobalVariable AumActionID = iota
+	AAIDPlaySound
+	AAIDInitializeActorDialog
+	AAIDSetZone
+	AAIDResetGame
 )
 
 type AumActionSet struct {
@@ -32,52 +32,73 @@ type AumMutableRuntimeState struct {
 
 type AumRuntimeAction interface {
 	Compile() []byte
+	CreateFrom([]byte)
 
 	// Execute accepts two parameters.
 	// The first parameter is the game state
 	// The second parameter is the input parameters
-	Execute(AumMutableRuntimeState, map[int32]interface{})
+	Execute(AumMutableRuntimeState)
 }
+
+type ARAPlaySoundType uint8
+
+const (
+	ARAPlaySoundTypeText ARAPlaySoundType = iota
+	ARAPlaySoundTypeAudio
+)
+
+type ARAPlaySound struct {
+	SoundType ARAPlaySoundType
+	Value     interface{}
+}
+type ARAInitializeActorDialog int32
+type ARASetZone int32
+type ARAResetGame bool
 
 // ARAs should be passed both the existing game state, and the output SSML.
 // Then, Execute() will mutate accordingly
 
-type ARASetGlobalVariables map[int32]string
+func (ara ARAPlaySound) Compile() []byte {
+	compiled := []byte{}
+	b := make([]byte, 4)
+	binary.LittleEndian.PutUint32(b, uint32(AAIDPlaySound))
+	compiled = append(compiled, b...)
+	compiled = append(compiled, byte(ara.SoundType))
+	switch ara.SoundType {
+	case ARAPlaySoundTypeText:
+		b := make([]byte, 4)
+		binary.LittleEndian.PutUint32(b, uint32(len(ara.Value.(string))))
+		compiled = append(compiled, b...)
+		compiled = append(compiled, []byte(ara.Value.(string))...)
+		break
+	case ARAPlaySoundTypeAudio:
+		b := make([]byte, 4)
+		binary.LittleEndian.PutUint32(b, uint32(len(ara.Value.(*url.URL).String())))
+		compiled = append(compiled, b...)
+		compiled = append(compiled, []byte(ara.Value.(*url.URL).String())...)
+		break
+	}
 
-func (ara ARASetGlobalVariables) Compile() []byte {
-	return []byte{}
+	b = make([]byte, 4)
+	binary.LittleEndian.PutUint32(b, uint32(len(compiled)))
+	finished := []byte{}
+	finished = append(finished, b...)
+	finished = append(finished, compiled...)
+
+	return finished
 }
-func (ara ARASetGlobalVariables) Execute(state *AumMutableRuntimeState, params map[int32]interface{}) {
-}
 
-func (ara ARAPlaySounds) Compile() []byte {
-	return []byte{}
-}
-
-type ARAPlaySoundsParams int32
-
-const (
-	ARAPlaySoundsParamText = iota
-	ARAPlaySoundParamAudio
-)
-
-func (ara ARAPlaySounds) Execute(state *AumMutableRuntimeState, params map[int32]interface{}) {
-	for k, v := range params {
-		switch k {
-		case ARAPlaySoundsParamText:
-			state.OutputSSML.Text(v.(string))
-			break
-		case ARAPlaySoundParamAudio:
-			state.OutputSSML.Audio(v.(*url.URL))
-			break
-		default:
-			fmt.Println("Invalid ARAPlaySounds param", k)
-			break
-		}
+func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
+	switch ara.SoundType {
+	case ARAPlaySoundTypeText:
+		state.OutputSSML = state.OutputSSML.Text(ara.Value.(string))
+		break
+	case ARAPlaySoundTypeAudio:
+		state.OutputSSML = state.OutputSSML.Audio(ara.Value.(*url.URL))
+		break
 	}
 }
 
-type ARAPlaySounds []int32
-type ARAInitializeActorDialog int32
-type ARASetZone int32
-type ARAResetGame bool
+func (ara ARAPlaySound) CreateFrom(bytes []byte) {
+
+}
