@@ -19,7 +19,7 @@ const (
 
 type AumActionSet struct {
 	SetGlobalVariables    map[int32]string
-	PlaySounds            []int32
+	PlaySounds            []ARAPlaySound
 	InitializeActorDialog int32
 	SetZone               int32
 	ResetGame             bool
@@ -66,15 +66,9 @@ func (ara ARAPlaySound) Compile() []byte {
 	compiled = append(compiled, byte(ara.SoundType))
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		b := make([]byte, 4)
-		binary.LittleEndian.PutUint32(b, uint32(len(ara.Value.(string))))
-		compiled = append(compiled, b...)
 		compiled = append(compiled, []byte(ara.Value.(string))...)
 		break
 	case ARAPlaySoundTypeAudio:
-		b := make([]byte, 4)
-		binary.LittleEndian.PutUint32(b, uint32(len(ara.Value.(*url.URL).String())))
-		compiled = append(compiled, b...)
 		compiled = append(compiled, []byte(ara.Value.(*url.URL).String())...)
 		break
 	}
@@ -99,6 +93,19 @@ func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 	}
 }
 
-func (ara ARAPlaySound) CreateFrom(bytes []byte) {
-
+func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
+	ara.SoundType = ARAPlaySoundType(bytes[0])
+	bytes = bytes[1:]
+	switch ara.SoundType {
+	case ARAPlaySoundTypeText:
+		ara.Value = string(bytes[:])
+		break
+	case ARAPlaySoundTypeAudio:
+		var err error
+		ara.Value, err = url.Parse(string(bytes[:]))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
