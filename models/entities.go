@@ -24,7 +24,11 @@ type AumProject struct {
 type AEID int
 
 const (
-	AEIDActors AEID = iota
+	AEIDActor AEID = iota
+	AEIDZone
+	AEIDTrigger
+	AEIDDialogNode
+	AEIDActionBundle
 )
 
 type AumDialog struct {
