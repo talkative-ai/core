@@ -46,6 +46,8 @@ const (
 // If ParentNodes == nil, then it's the entry of a dialog
 // If ChildNodes == nil, then it's the end of the dialog
 type AumDialogNode struct {
+	AumModel
+
 	EntryInput  []AumDialogInput `json:"entry"`
 	LogicalSet  RawLBlock        `json:"logical_set"`
 	ChildNodes  *[]AumDialogNode

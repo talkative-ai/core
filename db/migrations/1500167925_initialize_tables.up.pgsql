@@ -1,38 +1,38 @@
 -- Basic entities
 CREATE TABLE IF NOT EXISTS actors (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     title text,
     created_at timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS dialogs (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     title text,
     created_at timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS zones (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     title text,
     created_at timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS triggers (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     created_at
 );
 CREATE TABLE IF NOT EXISTS notes (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     title text,
     content text,
     created_at timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS action_sets (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     always jsonb,
     statements jsonb
 );
 
 -- Projects
 CREATE TABLE IF NOT EXISTS projects (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     title text,
     owner_id text,
     start_zone_id integer references zones(id),
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS dialog_node_action_sets (
 
 -- Gameplay event sourcing tables
 CREATE TABLE IF NOT EXISTS event_user_action (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     user_id integer,
     pub_id integer, -- Publishing ID; a unique ID that the project will have when published
     raw_input string,
