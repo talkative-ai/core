@@ -41,11 +41,10 @@ type AumActionSet struct {
 func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 	ch := make(chan AumRuntimeAction)
 	go func() {
-		defer func() {
-			close(ch)
-		}()
+		defer close(ch)
 		for _, r := range AAS.PlaySounds {
-			ch <- &r
+			action := r
+			ch <- &action
 		}
 	}()
 	return ch
