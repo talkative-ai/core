@@ -20,16 +20,22 @@ type AumProject struct {
 	Notes  []AumNote  `json:"notes,omitempty" db:"-"`
 }
 
+// AumEntityID
+type AEID int
+
+const (
+	AEIDActors AEID = iota
+)
+
 type AumDialog struct {
 	AumModel
 	Nodes []AumDialogNode `json:"nodes"`
 }
 
 type AumDialogNode struct {
-	ParentNode *AumDialogNode
-
-	EntryInput []AumDialogInput `json:"entry"`
-	ActionSet  RawLBlock        `json:"actions"`
+	EntryInput     []AumDialogInput `json:"entry"`
+	LogicalSet     RawLBlock        `json:"logical_set"`
+	ConnectedNodes []AumDialogNode
 }
 
 // Valid dialog types

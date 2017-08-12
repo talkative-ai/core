@@ -25,6 +25,19 @@ type AumActionSet struct {
 	ResetGame             bool
 }
 
+func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
+	ch := make(chan AumRuntimeAction)
+	go func() {
+		defer func() {
+			close(ch)
+		}()
+		for _, r := range AAS.PlaySounds {
+			ch <- &r
+		}
+	}()
+	return ch
+}
+
 type AumMutableRuntimeState struct {
 	State      map[string]string
 	OutputSSML ssml.Builder
@@ -32,12 +45,13 @@ type AumMutableRuntimeState struct {
 
 type AumRuntimeAction interface {
 	Compile() []byte
-	CreateFrom([]byte)
+	CreateFrom([]byte) error
+	GetAAID() AumActionID
 
 	// Execute accepts two parameters.
 	// The first parameter is the game state
 	// The second parameter is the input parameters
-	Execute(AumMutableRuntimeState)
+	Execute(*AumMutableRuntimeState)
 }
 
 type ARAPlaySoundType uint8
@@ -57,6 +71,10 @@ type ARAResetGame bool
 
 // ARAs should be passed both the existing game state, and the output SSML.
 // Then, Execute() will mutate accordingly
+
+func (ara ARAPlaySound) GetAAID() AumActionID {
+	return AAIDPlaySound
+}
 
 func (ara ARAPlaySound) Compile() []byte {
 	compiled := []byte{}
