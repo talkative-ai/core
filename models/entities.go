@@ -4,10 +4,13 @@ import (
 	"database/sql"
 )
 
+// AumModel is an embedded struct of common model fields
 type AumModel struct {
 	ID      *uint64 `json:"id" db:"id, primarykey, autoincrement"`
 	Created *string `json:"created_at,omitempty" db:"-"`
 }
+
+// AumProject is the model for a Workbench project
 type AumProject struct {
 	AumModel
 
@@ -20,65 +23,82 @@ type AumProject struct {
 	Notes  []AumNote  `json:"notes,omitempty" db:"-"`
 }
 
-// AumEntityID
+// AEID is an AumEntityID
+// Useful for Redis key mapping
 type AEID int
 
 const (
+	// AEIDActor AumEntityID for Actor
 	AEIDActor AEID = iota
+
+	// AEIDZone AumEntityID for Zone
 	AEIDZone
+
+	// AEIDTrigger AumEntityID for Trigger
 	AEIDTrigger
+	// AEIDDialogNode AumEntityID for DialogNode
 	AEIDDialogNode
+	// AEIDActionBundle AumEntityID for ActionBundle
 	AEIDActionBundle
 )
 
-type AumDialog struct {
-	AumModel
-	Nodes []AumDialogNode `json:"nodes"`
-}
-
+// AumDialogNode is a single instance of a Dialog
+// If ParentNodes == nil, then it's the entry of a dialog
+// If ChildNodes == nil, then it's the end of the dialog
 type AumDialogNode struct {
-	EntryInput     []AumDialogInput `json:"entry"`
-	LogicalSet     RawLBlock        `json:"logical_set"`
-	ConnectedNodes []AumDialogNode
+	EntryInput  []AumDialogInput `json:"entry"`
+	LogicalSet  RawLBlock        `json:"logical_set"`
+	ChildNodes  *[]AumDialogNode
+	ParentNodes *[]AumDialogNode
 }
 
-// Valid dialog types
-// Verb statement (Example: “I will <Verb> the <Actor>”)
-// Provides a Verb and an Actor
-// Verb question (Example: “Did you <Verb> the <Actor>?”)
-// Provides a Verb and an Actor
-// Possessional question (Example: “Do you have <Actor>?”)
-// Provides an Actor
+// AumDialogInput indicatres valid dialog entry types
+// As specified in https://aum.ai
 // Greeting (Example: “Hello <Actor>”)
 // Provides an Actor
 type AumDialogInput string
 
 const (
-	AumDialogInputStatementVerb        AumDialogInput = "statement_verb"
-	AumDialogInputGreeting             AumDialogInput = "statement_greeting"
-	AumDialogInputFarewell             AumDialogInput = "statement_farewell"
-	AumDialogInputQuestionVerb         AumDialogInput = "question_verb"
+	// AumDialogInputStatementVerb Verb statement
+	// (Example: “I will <Verb> the <Actor>”)
+	// Provides a Verb and an Actor
+	AumDialogInputStatementVerb AumDialogInput = "statement_verb"
+	// AumDialogInputGreeting Generic greeting
+	// (Example: "Hello <Actor>")
+	// Provides an optional Actor
+	AumDialogInputGreeting AumDialogInput = "statement_greeting"
+	// AumDialogInputFarewell Generic farewell
+	// (Example: "Goodbye <Actor>")
+	// Provides an optional Actor
+	AumDialogInputFarewell AumDialogInput = "statement_farewell"
+	// AumDialogInputQuestionVerb Verb question
+	// (Example: “Did you <Verb> the <Actor>?”)
+	// Provides a Verb and an Actor
+	AumDialogInputQuestionVerb AumDialogInput = "question_verb"
+	// AumDialogInputQuestionPossessional Possessional question
+	// (Example: “Do you have <Actor>?”)
+	// Provides an Actor
 	AumDialogInputQuestionPossessional AumDialogInput = "question_possessional"
-	AumDialogInputCustom               AumDialogInput = "custom"
 )
 
+// AumActor model for the Actor entities
 type AumActor struct {
 	AumModel
 
 	Title   string `json:"title" db:"title"`
-	Dialogs []AumDialog
+	Dialogs []AumDialogNode
 }
 
+// AumZone model for the Zone entities
 type AumZone struct {
 	AumModel
 
-	Description      string                `json:"description"`
-	Objects          []uint64              `json:"objects,omitempty"`
-	Actors           []uint64              `json:"actors,omitempty"`
-	LinkedZones      []AumZoneLink         `json:"linkedZones,omitempty"`
-	CustomProperties []AumCustomProperties `json:"customProperties,omitempty"`
+	Description string        `json:"description"`
+	Actors      []uint64      `json:"actors,omitempty"`
+	LinkedZones []AumZoneLink `json:"linkedZones,omitempty"`
 }
 
+// AumZoneLink explicitly linked zones
 type AumZoneLink struct {
 	AumModel
 
@@ -86,13 +106,13 @@ type AumZoneLink struct {
 	ZoneTo   uint64
 }
 
+// AumTrigger model for Trigger entities
 type AumTrigger struct {
 	AumModel
 }
 
+// AumNote model for the Note entities
 type AumNote struct {
 	AumModel
 	Text string `json:"text"`
 }
-
-type AumCustomProperties map[string]interface{}

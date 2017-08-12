@@ -24,7 +24,7 @@ func InitializeDB() error {
 	DBMap.AddTableWithName(models.AumProject{}, "projects")
 	DBMap.AddTableWithName(models.AumZone{}, "zones")
 	DBMap.AddTableWithName(models.AumActor{}, "actors")
-	DBMap.AddTableWithName(models.AumDialog{}, "dialogs")
+	DBMap.AddTableWithName(models.AumDialogNode{}, "dialogs")
 	DBMap.AddTableWithName(models.AumNote{}, "notes")
 
 	return nil
