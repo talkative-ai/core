@@ -48,10 +48,10 @@ const (
 type AumDialogNode struct {
 	AumModel
 
-	EntryInput  []AumDialogInput `json:"entry"`
-	LogicalSet  RawLBlock        `json:"logical_set"`
-	ChildNodes  *[]AumDialogNode
-	ParentNodes *[]AumDialogNode
+	EntryInput  []AumDialogInput  `json:"entry"`
+	LogicalSet  RawLBlock         `json:"logical_set"`
+	ChildNodes  *[]*AumDialogNode `db:"-"`
+	ParentNodes *[]*AumDialogNode `db:"-"`
 }
 
 // AumDialogInput indicatres valid dialog entry types
