@@ -47,10 +47,13 @@ CREATE TABLE IF NOT EXISTS dialog_nodes (
     id BIGSERIAL PRIMARY KEY,
     zone_id bigint NOT NULL references zones(id),
     entry text[],
-    parent_nodes bigint references dialog_nodes(id),
-    child_nodes bigint references dialog_nodes(id),
-    logical_set_id bigint references logical_set(id)
+    logical_set_id bigint NOT NULL references logical_set(id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS dialog_nodes_relations (
+    parent_node_id bigint NOT NULL references dialog_nodes(id),
+    child_node_id bigint NOT NULL references dialog_nodes(id)
 );
 
 -- Gameplay event sourcing tables

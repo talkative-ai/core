@@ -4,6 +4,7 @@ DROP TABLE zones CASCADE;
 DROP TABLE triggers CASCADE;
 DROP TABLE notes CASCADE;
 DROP TABLE logical_set CASCADE;
+DROP TABLE dialog_nodes_relations CASCADE;
 DROP TABLE dialog_nodes CASCADE;
 DROP TABLE event_user_action CASCADE;
 DROP TABLE event_state_change CASCADE;
