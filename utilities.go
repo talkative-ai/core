@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -43,4 +44,34 @@ func GenerateRandomBytes(n int) ([]byte, error) {
 func GenerateRandomString(s int) (string, error) {
 	b, err := GenerateRandomBytes(s)
 	return base64.URLEncoding.EncodeToString(b), err
+}
+
+type ByteReader struct {
+	Reader   *bytes.Reader
+	Position uint64
+}
+
+func (br *ByteReader) ReadNBytes(n uint64) ([]byte, error) {
+	bslice := []byte{}
+
+	for i := uint64(0); i < n; i++ {
+		b, err := br.Reader.ReadByte()
+		if err != nil {
+			return []byte{}, err
+		}
+		bslice = append(bslice, b)
+	}
+
+	br.Position += n
+
+	return bslice, nil
+}
+
+func (br *ByteReader) ReadByte() (byte, error) {
+	br.Position++
+	return br.Reader.ReadByte()
+}
+
+func (br *ByteReader) Finished() bool {
+	return int(br.Position) >= br.Reader.Len()
 }

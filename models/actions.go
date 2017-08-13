@@ -100,13 +100,20 @@ func (ara ARAPlaySound) GetAAID() AumActionID {
 	return AAIDPlaySound
 }
 
+func GetActionFromID(id AumActionID) AumRuntimeAction {
+	switch id {
+	case AAIDPlaySound:
+		return &ARAPlaySound{}
+	default:
+		return nil
+	}
+}
+
 // Compile is used by Lakshmi
 // Returns the compiled []byte slice of the runtime action
 func (ara ARAPlaySound) Compile() []byte {
 	compiled := []byte{}
 	b := make([]byte, 4)
-	binary.LittleEndian.PutUint32(b, uint32(AAIDPlaySound))
-	compiled = append(compiled, b...)
 	compiled = append(compiled, byte(ara.SoundType))
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
