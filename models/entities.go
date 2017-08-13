@@ -7,7 +7,7 @@ import (
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
 	ID      *uint64 `json:"id" db:"id, primarykey, autoincrement"`
-	Created *string `json:"created_at,omitempty" db:"-"`
+	Created *string `json:"created_at,omitempty"`
 }
 
 // AumProject is the model for a Workbench project

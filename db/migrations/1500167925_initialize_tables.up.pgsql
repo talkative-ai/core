@@ -40,12 +40,13 @@ CREATE TABLE IF NOT EXISTS notes (
 );
 CREATE TABLE IF NOT EXISTS logical_set (
     id BIGSERIAL PRIMARY KEY,
-    always jsonb,
-    statements jsonb
+    always JSONB,
+    statements JSONB
 );
 CREATE TABLE IF NOT EXISTS dialog_nodes (
     id BIGSERIAL PRIMARY KEY,
-    project_id bigint NOT NULL references projects(id),
+    zone_id bigint NOT NULL references zones(id),
+    entry text[],
     parent_nodes bigint references dialog_nodes(id),
     child_nodes bigint references dialog_nodes(id),
     logical_set_id bigint references logical_set(id)
@@ -62,7 +63,7 @@ CREATE TABLE IF NOT EXISTS event_user_action (
 );
 CREATE TABLE IF NOT EXISTS event_state_change (
     event_user_action_id bigint NOT NULL references event_user_action(id),
-    state_object jsonb,
+    state_object JSONB,
     created_at timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS published_projects (
