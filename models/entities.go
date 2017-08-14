@@ -6,17 +6,17 @@ import (
 
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
-	ID      *uint64 `json:"id" db:"id, primarykey, autoincrement"`
-	Created *string `json:"created_at,omitempty"`
+	ID      uint64 `json:"id" db:"id, primarykey, autoincrement"`
+	Created string `json:"created_at,omitempty" db:"created_at"`
 }
 
 // AumProject is the model for a Workbench project
 type AumProject struct {
 	AumModel
 
-	Title     string        `json:"title" db:"title"`
-	OwnerID   string        `json:"-" db:"owner_id"`
-	StartZone sql.NullInt64 `json:"startZone,omitempty" db:"start_zone_id"` // Expected Zone ID
+	Title     string         `json:"title"`
+	OwnerID   sql.NullString `json:"-" db:"owner_id"`
+	StartZone sql.NullInt64  `json:"startZone,omitempty" db:"start_zone_id"` // Expected Zone ID
 
 	Actors []AumActor `json:"actors,omitempty" db:"-"`
 	Zones  []AumZone  `json:"locations,omitempty" db:"-"`
@@ -48,13 +48,15 @@ const (
 type AumDialogNode struct {
 	AumModel
 
+	ProjectID   uint64
+	ZoneID      uint64
 	EntryInput  []AumDialogInput  `json:"entry"`
 	LogicalSet  RawLBlock         `json:"logical_set"`
 	ChildNodes  *[]*AumDialogNode `db:"-"`
 	ParentNodes *[]*AumDialogNode `db:"-"`
 }
 
-// AumDialogInput indicatres valid dialog entry types
+// AumDialogInput indicates valid dialog entry types
 // As specified in https://aum.ai
 // Greeting (Example: “Hello <Actor>”)
 // Provides an Actor
