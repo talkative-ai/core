@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"strings"
+
+	"github.com/go-redis/redis"
 )
 
 type BSliceIndex struct {
@@ -11,14 +13,23 @@ type BSliceIndex struct {
 	Bslice []byte
 }
 
-// RedisBytes is used to communicate values to be written to Redis
-type RedisBytes struct {
-	Key   string
-	Bytes []byte
+type RedisCommand func(redis *redis.Client)
+
+func RedisSET(key string, bytes []byte) RedisCommand {
+	return func(redis *redis.Client) {
+		redis.Set(key, bytes, 0)
+	}
+}
+
+func RedisHSET(key, field string, bytes []byte) RedisCommand {
+	return func(redis *redis.Client) {
+		redis.HSet(key, field, bytes)
+	}
 }
 
 type ProjectItem struct {
 	ProjectID            uint64
+	Title                string
 	ZoneID               uint64
 	DialogID             uint64
 	DialogEntry          StringArray
