@@ -54,7 +54,7 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 // It contains the current State of the running game / project (called the runtime state)
 // and the OutputSSML, Speech-synthesis markup language
 type AumMutableRuntimeState struct {
-	State      map[string]string
+	State      map[string]interface{}
 	OutputSSML ssml.Builder
 }
 
