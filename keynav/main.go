@@ -30,31 +30,47 @@ func CompiledEntity(pubID uint64, entityID models.AEID, uniqueID uint64) string 
 }
 
 // CompiledDialogRootWithinZone generates the key for a dialog root node within a zone
+// Notice that we're not using a node ID. This is because the list of nodes within a zone
+// are not readily available, for performance reasons.
 func CompiledDialogRootWithinZone(pubID, zoneID uint64) string {
 	return fmt.Sprintf("%v:e:%v:i",
-		CompiledEntity(pubID, models.AEIDZone, zoneID), models.AEIDDialogNode)
+		CompiledEntity(pubID, models.AEIDZone, zoneID),
+		models.AEIDDialogNode)
 }
 
+// CompiledDialogNodeWithinZone generates the key for a dialog node within a zone
 func CompiledDialogNodeWithinZone(pubID, zoneID, parentDialogID uint64) string {
-	return fmt.Sprintf("%v:%v:e:%v:%v:e:%v:%v:i",
-		compiledNamespaceV1(), pubID, models.AEIDZone, zoneID, models.AEIDDialogNode, parentDialogID)
+	return fmt.Sprintf("%v:e:%v:%v:i",
+		CompiledEntity(pubID, models.AEIDZone, zoneID),
+		models.AEIDDialogNode, parentDialogID)
 }
 
+// CompiledDialogNodeActionBundle generates the key for
+// an action bundle within a dialog node
 func CompiledDialogNodeActionBundle(pubID, dialogID, bundleID uint64) string {
-	return fmt.Sprintf("%v:%v:e:%v:%v:e:%v:%v",
-		compiledNamespaceV1(), pubID, models.AEIDDialogNode, dialogID, models.AEIDActionBundle, bundleID)
+	return fmt.Sprintf("%v:e:%v:%v",
+		CompiledEntity(pubID, models.AEIDDialogNode, dialogID),
+		models.AEIDActionBundle, bundleID)
 }
 
+// ProjectMetadataStatic generates the key to access the static metadata hash
+// Static means these values are not updated after published.
 func ProjectMetadataStatic(pubID uint64) string {
 	return fmt.Sprintf("%v:%v:m:s",
-		compiledNamespaceV1(), pubID)
+		compiledNamespaceV1(),
+		pubID)
 }
 
-func ProjectMetadataDynamicProperty(pubID uint64, property string) string {
-	return fmt.Sprintf("%v:%v:m:d:%v",
-		compiledNamespaceV1(), pubID, property)
+// ProjectMetadataDynamic generates the key to access the dynamic metadata hash
+// Dynamic means these values may be updated after published.
+func ProjectMetadataDynamic(pubID uint64) string {
+	return fmt.Sprintf("%v:%v:m:d",
+		compiledNamespaceV1(),
+		pubID)
 }
 
+// GlobalMetaProjects generates the key to access the hash of all published projects
+// Mapping project name to project ID
 func GlobalMetaProjects() string {
 	return fmt.Sprintf("%v:live:projects", compiledNamespaceV1())
 }
