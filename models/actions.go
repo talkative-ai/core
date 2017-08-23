@@ -146,7 +146,8 @@ func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 	}
 }
 
-// CreateFrom is useful for testing
+// CreateFrom is used for evaluating the actions in Brahman and followed by Execute
+// This could be put in a single "Execute" but this way is less monolothic
 func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 	ara.SoundType = ARAPlaySoundType(bytes[0])
 	bytes = bytes[1:]

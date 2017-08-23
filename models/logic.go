@@ -2,31 +2,43 @@ package models
 
 // LBlock is the RawLBlock after AumActionSet has been bundled
 type LBlock struct {
-	AlwaysExec string          `json:"always"`
+	// AlwaysExec are actions that have no conditions
+	AlwaysExec string `json:"always"`
+
+	// Statements is an array of arrays containing objects that are
+	// implicit "if/elif/else" blocks. e.g.
+	// Statements:
+	//	[
+	//		[ If: []LBlock, ElIf: []LBlock, Else: []LBlock ]LStatement,
+	//		[ If: []LBlock, ElIf: []LBlock, Else: []LBlock ]LStatement,
+	//	]
+	// Consider an []LStatement of length n
+	// LStatement[0] is the "if" statement
+	// LStatement[1 : n-1] are "else if" statements
+	// LStatement[n-1] is the "else" statement
+	// If n == 2, then LStatement[n-1] might be "elif" or "else"
+	// depending on whether Operators == nil
+	// If Operators == nil then we expect Exec to be executed right away
+	//
+	// Each []LStatement is executed in order as they mutate the runtime state
 	Statements *[][]LStatement `json:"statements"`
 }
 
 // LStatement is the RawLStatement after AumActionSet has been bundled
+// The OrGroup must yield true for the Exec AumActionSet to execute
+// Exec mutates the runtimes state of an AUM instance
 type LStatement struct {
 	Operators *OrGroup `json:"conditions"`
 	Exec      string
 }
 
 // RawLBlock contains every execution block
-// AlwaysExec are actions that have no conditions
-// Statements are an array of arrays containing objects that might look like this
-// Statements: [ [ If: [], ElIf: [], Else: [] ], [ If: [], ElIf: [], Else[] ] ]
-// Each []RawLStatement is executed in order as they mutate the runtime state
-// Each RawLStatement within []RawLStatement is an implicit "if"/"elif"/"else" block,
-// where the conditions of each one are tested in order until one results in true
 type RawLBlock struct {
 	AlwaysExec AumActionSet       `json:"always"`
 	Statements *[][]RawLStatement `json:"statements"`
 }
 
 // RawLStatement contains an OrGroup of AndGroups
-// The OrGroup must yield true for the Exec AumActionSet to execute
-// Exec mutates the runtimes state of an AUM instance
 type RawLStatement struct {
 	Operators *OrGroup     `json:"conditions"`
 	Exec      AumActionSet `json:"then"`
