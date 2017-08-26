@@ -21,11 +21,11 @@ func InitializeDB() error {
 
 	DBMap = &gorp.DbMap{Db: Instance.DB, Dialect: gorp.PostgresDialect{}}
 
-	DBMap.AddTableWithName(models.AumProject{}, "projects")
-	DBMap.AddTableWithName(models.AumZone{}, "zones")
-	DBMap.AddTableWithName(models.AumActor{}, "actors")
-	DBMap.AddTableWithName(models.AumDialogNode{}, "dialogs")
-	DBMap.AddTableWithName(models.AumNote{}, "notes")
+	DBMap.AddTableWithName(models.AumProject{}, "workbench_projects")
+	DBMap.AddTableWithName(models.AumZone{}, "workbench_zones")
+	DBMap.AddTableWithName(models.AumActor{}, "workbench_actors")
+	DBMap.AddTableWithName(models.AumDialogNode{}, "workbench_dialogs")
+	DBMap.AddTableWithName(models.AumNote{}, "workbench_notes")
 
 	DBMap.AddTableWithName(models.User{}, "users")
 	DBMap.AddTableWithName(models.UserLinkedAccount{}, "user_linked_accounts")

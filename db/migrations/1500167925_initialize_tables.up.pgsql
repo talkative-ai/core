@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS team_members (
     role SMALLINT
 );
 
--- Projects
-CREATE TABLE IF NOT EXISTS projects (
+-- Workbench Projects
+CREATE TABLE IF NOT EXISTS workbench_projects (
     id BIGSERIAL PRIMARY KEY,
     team_id BIGINT NOT NULL REFERENCES teams(id),
     title TEXT,
@@ -34,52 +34,52 @@ CREATE TABLE IF NOT EXISTS projects (
 );
 
 -- Basic entities
-CREATE TABLE IF NOT EXISTS actors (
+CREATE TABLE IF NOT EXISTS workbench_actors (
     id BIGSERIAL PRIMARY KEY,
-    project_id BIGINT NOT NULL REFERENCES projects(id),
+    project_id BIGINT NOT NULL REFERENCES workbench_projects(id),
     title TEXT,
     created_at timestamp DEFAULT current_timestamp
 );
-CREATE TABLE IF NOT EXISTS zones (
+CREATE TABLE IF NOT EXISTS workbench_zones (
     id BIGSERIAL PRIMARY KEY,
-    project_id BIGINT NOT NULL REFERENCES projects(id),
+    project_id BIGINT NOT NULL REFERENCES workbench_projects(id),
     title TEXT,
     created_at timestamp DEFAULT current_timestamp
 );
 
-ALTER TABLE projects
+ALTER TABLE workbench_projects
     ADD CONSTRAINT fk_startzone
     FOREIGN KEY (start_zone_id)
-    REFERENCES zones(id);
+    REFERENCES workbench_zones(id);
 
-CREATE TABLE IF NOT EXISTS triggers (
+CREATE TABLE IF NOT EXISTS workbench_triggers (
     id BIGSERIAL PRIMARY KEY,
-    project_id BIGINT NOT NULL REFERENCES projects(id),
+    project_id BIGINT NOT NULL REFERENCES workbench_projects(id),
     created_at timestamp DEFAULT current_timestamp
 );
-CREATE TABLE IF NOT EXISTS notes (
+CREATE TABLE IF NOT EXISTS workbench_notes (
     id BIGSERIAL PRIMARY KEY,
-    project_id BIGINT NOT NULL REFERENCES projects(id),
+    project_id BIGINT NOT NULL REFERENCES workbench_projects(id),
     title TEXT,
     content TEXT,
     created_at timestamp DEFAULT current_timestamp
 );
-CREATE TABLE IF NOT EXISTS logical_set (
+CREATE TABLE IF NOT EXISTS workbench_logical_set (
     id BIGSERIAL PRIMARY KEY,
     always JSONB,
     statements JSONB
 );
-CREATE TABLE IF NOT EXISTS dialog_nodes (
+CREATE TABLE IF NOT EXISTS workbench_dialog_nodes (
     id BIGSERIAL PRIMARY KEY,
-    zone_id BIGINT NOT NULL REFERENCES zones(id),
+    zone_id BIGINT NOT NULL REFERENCES workbench_zones(id),
     entry TEXT[],
-    logical_set_id BIGINT NOT NULL REFERENCES logical_set(id)
+    logical_set_id BIGINT NOT NULL REFERENCES workbench_logical_set(id)
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS dialog_nodes_relations (
-    parent_node_id BIGINT NOT NULL REFERENCES dialog_nodes(id),
-    child_node_id BIGINT NOT NULL REFERENCES dialog_nodes(id)
+CREATE TABLE IF NOT EXISTS workbench_dialog_nodes_relations (
+    parent_node_id BIGINT NOT NULL REFERENCES workbench_dialog_nodes(id),
+    child_node_id BIGINT NOT NULL REFERENCES workbench_dialog_nodes(id)
 );
 
 -- Gameplay event sourcing tables
@@ -97,9 +97,9 @@ CREATE TABLE IF NOT EXISTS event_state_change (
 );
 
 -- Misc
-CREATE TABLE IF NOT EXISTS published_projects (
+CREATE TABLE IF NOT EXISTS published_workbench_projects (
     pub_id BIGSERIAL PRIMARY KEY,
-    project_id BIGINT NOT NULL REFERENCES projects(id),
+    project_id BIGINT NOT NULL REFERENCES workbench_projects(id),
     title TEXT,
     creator TEXT,
     created_at timestamp DEFAULT current_timestamp
