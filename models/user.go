@@ -1,10 +1,19 @@
 package models
 
-// User model for the Workbench User, authenticated by Google
-// TODO: This will change as we allow sign-ups to AUM via other modes than just Google
+// User model for the AUM User
 type User struct {
-	Sub     string
-	Email   string
-	Name    string
-	Picture string
+	ID    uint64
+	Email string
+}
+
+// UserLinkedAccount model for linking accounts to a User (e.g. Google)
+type UserLinkedAccount struct {
+	UserID   uint64
+	Email    string
+	Provider string
+}
+
+type Team struct {
+	ID   uint64
+	Name string
 }

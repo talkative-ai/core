@@ -1,4 +1,11 @@
-INSERT INTO projects (title) VALUES ('The Spooky House');
+-- Password: THISisthePASSWORD!forAUMtestACCOUNT:)
+INSERT INTO users (email, passwordsha, salt) VALUES (
+  'test@aum.ai',
+  '369214D341838EADED50CB089766B8EDBB74F9AB642059EAA7CD5F977F80B57ED8F455C0EC9A13979CEEB5DB2D65FF121AE2E817FDE285BFE548D9128177FC27',
+  'qrbFIauvCuipVogmzvJB');
+INSERT INTO teams (team_name) VALUES (NULL);
+INSERT INTO team_members (team_id, user_id, role) VALUES (1, 1, 1);
+INSERT INTO projects (team_id, title) VALUES (1, 'The Spooky House');
 INSERT INTO zones (project_id, title) VALUES (1, 'Hall');
 UPDATE projects SET start_zone_id=1 WHERE id=1;
 INSERT INTO logical_set (always) VALUES ('{"play_sounds":[{"sound_type":0,"value":"Hello world!"}]}');
