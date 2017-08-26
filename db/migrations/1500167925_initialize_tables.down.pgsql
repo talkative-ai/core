@@ -1,5 +1,4 @@
 DROP TABLE users CASCADE;
-DROP TABLE user_linked_accounts CASCADE;
 DROP TABLE teams CASCADE;
 DROP TABLE team_members CASCADE;
 DROP TABLE workbench_projects CASCADE;

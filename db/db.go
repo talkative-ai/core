@@ -1,6 +1,8 @@
 package db
 
 import (
+	"database/sql"
+
 	"github.com/artificial-universe-maker/go-utilities/models"
 	"github.com/go-gorp/gorp"
 	"github.com/jmoiron/sqlx"
@@ -28,8 +30,23 @@ func InitializeDB() error {
 	DBMap.AddTableWithName(models.AumNote{}, "workbench_notes")
 
 	DBMap.AddTableWithName(models.User{}, "users")
-	DBMap.AddTableWithName(models.UserLinkedAccount{}, "user_linked_accounts")
 	DBMap.AddTableWithName(models.Team{}, "teams")
 
+	return nil
+}
+
+func CreateAndSaveUser(user *models.User) error {
+	err := DBMap.Insert(user)
+	if err != nil {
+		return err
+	}
+	team := &models.Team{Name: sql.NullString{Valid: false}}
+	if err = DBMap.Insert(team); err != nil {
+		return err
+	}
+	teamMember := &models.TeamMember{UserID: user.ID, TeamID: team.ID, Role: 1}
+	if err = DBMap.Insert(teamMember); err != nil {
+		return err
+	}
 	return nil
 }

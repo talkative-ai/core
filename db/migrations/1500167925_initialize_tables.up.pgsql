@@ -1,15 +1,11 @@
 -- Users
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
+    name TEXT,
     email TEXT,
+    image TEXT,
     passwordsha TEXT,
     salt TEXT
-);
-
-CREATE TABLE IF NOT EXISTS user_linked_accounts (
-    user_id BIGINT NOT NULL REFERENCES users(id),
-    provider TEXT,
-    email TEXT
 );
 
 -- User Teams
