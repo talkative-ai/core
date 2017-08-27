@@ -2,11 +2,13 @@ package models
 
 import (
 	"database/sql"
+
+	"github.com/go-gorp/gorp"
 )
 
 // User model for the AUM User
 type User struct {
-	ID          uint64
+	AumModel
 	GivenName   string
 	FamilyName  string
 	Email       string
@@ -19,14 +21,15 @@ type User struct {
 // Team model relates multiple users under the same umbrella
 // If the Name is null, then it's the user by themselves
 type Team struct {
-	ID   uint64
+	AumModel
 	Name sql.NullString
 }
 
 // TeamMember is the relationship bretween a user and a team
 // and includes the user's role within the team
 type TeamMember struct {
-	UserID uint64
-	TeamID uint64
-	Role   int
+	UserID    uint64
+	TeamID    uint64
+	Role      int
+	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
 }

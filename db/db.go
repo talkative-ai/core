@@ -31,6 +31,7 @@ func InitializeDB() error {
 
 	DBMap.AddTableWithName(models.User{}, "users")
 	DBMap.AddTableWithName(models.Team{}, "teams")
+	DBMap.AddTableWithName(models.TeamMember{}, "team_members")
 
 	return nil
 }

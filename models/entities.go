@@ -2,12 +2,21 @@ package models
 
 import (
 	"database/sql"
+	"time"
+
+	"github.com/go-gorp/gorp"
 )
 
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
-	ID        uint64 `db:"ID, primarykey, autoincrement"`
-	CreatedAt string `json:"CreatedAt,omitempty"`
+	ID        uint64        `db:"ID, primarykey, autoincrement"`
+	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
+}
+
+func (m *AumModel) PreInsert(s gorp.SqlExecutor) error {
+	m.CreatedAt.Time = time.Now()
+	m.CreatedAt.Valid = true
+	return nil
 }
 
 // AumProject is the model for a Workbench project
