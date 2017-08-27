@@ -6,21 +6,21 @@ import (
 
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
-	ID      uint64 `json:"id" db:"id, primarykey, autoincrement"`
-	Created string `json:"created_at,omitempty" db:"created_at"`
+	ID        uint64 `db:"ID, primarykey, autoincrement"`
+	CreatedAt string `json:"CreatedAt,omitempty"`
 }
 
 // AumProject is the model for a Workbench project
 type AumProject struct {
 	AumModel
 
-	Title     string         `json:"title"`
-	OwnerID   sql.NullString `json:"-" db:"owner_id"`
-	StartZone sql.NullInt64  `json:"startZone,omitempty" db:"start_zone_id"` // Expected Zone ID
+	Title     string
+	OwnerID   sql.NullString `json:"-"`
+	StartZone sql.NullInt64  `json:"StartZone,omitempty"` // Expected Zone ID
 
-	Actors []AumActor `json:"actors,omitempty" db:"-"`
-	Zones  []AumZone  `json:"locations,omitempty" db:"-"`
-	Notes  []AumNote  `json:"notes,omitempty" db:"-"`
+	Actors []AumActor `json:"Actors,omitempty" db:"-"`
+	Zones  []AumZone  `json:"Zones,omitempty" db:"-"`
+	Notes  []AumNote  `json:"Notes,omitempty" db:"-"`
 }
 
 // AEID is an AumEntityID
@@ -50,8 +50,8 @@ type AumDialogNode struct {
 
 	ProjectID   uint64
 	ZoneID      uint64
-	EntryInput  []AumDialogInput  `json:"entry"`
-	LogicalSet  RawLBlock         `json:"logical_set"`
+	EntryInput  []AumDialogInput
+	LogicalSet  RawLBlock
 	ChildNodes  *[]*AumDialogNode `db:"-"`
 	ParentNodes *[]*AumDialogNode `db:"-"`
 }
@@ -89,7 +89,7 @@ const (
 type AumActor struct {
 	AumModel
 
-	Title   string `json:"title" db:"title"`
+	Title   string
 	Dialogs []AumDialogNode
 }
 
@@ -97,9 +97,9 @@ type AumActor struct {
 type AumZone struct {
 	AumModel
 
-	Description string        `json:"description"`
-	Actors      []uint64      `json:"actors,omitempty"`
-	LinkedZones []AumZoneLink `json:"linkedZones,omitempty"`
+	Description string
+	Actors      []uint64      `json:"Actors,omitempty"`
+	LinkedZones []AumZoneLink `json:"LinkedZones,omitempty"`
 }
 
 // AumZoneLink explicitly linked zones
@@ -118,5 +118,5 @@ type AumTrigger struct {
 // AumNote model for the Note entities
 type AumNote struct {
 	AumModel
-	Text string `json:"text"`
+	Text string
 }

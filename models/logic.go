@@ -3,7 +3,7 @@ package models
 // LBlock is the RawLBlock after AumActionSet has been bundled
 type LBlock struct {
 	// AlwaysExec are actions that have no conditions
-	AlwaysExec string `json:"always"`
+	AlwaysExec string
 
 	// Statements is an array of arrays containing objects that are
 	// implicit "if/elif/else" blocks. e.g.
@@ -21,27 +21,27 @@ type LBlock struct {
 	// If Operators == nil then we expect Exec to be executed right away
 	//
 	// Each []LStatement is executed in order as they mutate the runtime state
-	Statements *[][]LStatement `json:"statements"`
+	Statements *[][]LStatement
 }
 
 // LStatement is the RawLStatement after AumActionSet has been bundled
 // The OrGroup must yield true for the Exec AumActionSet to execute
 // Exec mutates the runtimes state of an AUM instance
 type LStatement struct {
-	Operators *OrGroup `json:"conditions"`
+	Operators *OrGroup
 	Exec      string
 }
 
 // RawLBlock contains every execution block
 type RawLBlock struct {
-	AlwaysExec AumActionSet       `json:"always"`
-	Statements *[][]RawLStatement `json:"statements"`
+	AlwaysExec AumActionSet
+	Statements *[][]RawLStatement
 }
 
 // RawLStatement contains an OrGroup of AndGroups
 type RawLStatement struct {
-	Operators *OrGroup     `json:"conditions"`
-	Exec      AumActionSet `json:"then"`
+	Operators *OrGroup
+	Exec      AumActionSet
 }
 
 // VarValMap contains a mapping of variables
