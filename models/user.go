@@ -13,7 +13,7 @@ type User struct {
 	FamilyName  string
 	Email       string
 	Image       string
-	Password    string `db:"-"`
+	Password    string `json:",omitempty" db:"-"`
 	PasswordSHA string `json:"-"`
 	Salt        string `json:"-"`
 }
