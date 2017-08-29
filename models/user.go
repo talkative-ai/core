@@ -8,7 +8,7 @@ import (
 
 // User model for the AUM User
 type User struct {
-	AumModel
+	AumModel    `json:"-"`
 	GivenName   string
 	FamilyName  string
 	Email       string
