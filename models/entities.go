@@ -34,6 +34,7 @@ type AumProject struct {
 
 func (p AumProject) PrepareMarshal() map[string]interface{} {
 	result := map[string]interface{}{
+		"ID":        p.ID,
 		"Title":     p.Title,
 		"CreatedAt": p.CreatedAt.Time,
 	}

@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/go-gorp/gorp"
 )
@@ -32,4 +33,10 @@ type TeamMember struct {
 	TeamID    uint64
 	Role      int
 	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
+}
+
+func (m *TeamMember) PreInsert(s gorp.SqlExecutor) error {
+	m.CreatedAt.Time = time.Now()
+	m.CreatedAt.Valid = true
+	return nil
 }
