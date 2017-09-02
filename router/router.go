@@ -4,15 +4,14 @@ import (
 	"net/http"
 
 	"github.com/artificial-universe-maker/go-utilities/prehandle"
-
-	mux "github.com/artificial-universe-maker/muxlite"
+	"github.com/gorilla/mux"
 )
 
 // Route contains route information for multiplexing
 type Route struct {
 	http.Handler
 	Prehandler []prehandle.Prehandler
-	Method     mux.Method
+	Method     string
 	Path       string
 }
 

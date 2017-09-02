@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/go-gorp/gorp"
@@ -23,13 +24,26 @@ func (m *AumModel) PreInsert(s gorp.SqlExecutor) error {
 type AumProject struct {
 	AumModel
 
-	Title     string
-	OwnerID   sql.NullString `json:"-"`
-	StartZone sql.NullInt64  `json:"StartZone,omitempty"` // Expected Zone ID
+	Title       string
+	TeamID      uint64
+	StartZoneID sql.NullInt64 // Expected Zone ID
 
-	Actors []AumActor `json:"Actors,omitempty" db:"-"`
-	Zones  []AumZone  `json:"Zones,omitempty" db:"-"`
-	Notes  []AumNote  `json:"Notes,omitempty" db:"-"`
+	Actors []AumActor `db:"-"`
+	Zones  []AumZone  `db:"-"`
+	Notes  []AumNote  `db:"-"`
+}
+
+func (p AumProject) MarshalJSON() ([]byte, error) {
+	result := map[string]interface{}{
+		"Title":     p.Title,
+		"CreatedAt": p.CreatedAt.Time,
+	}
+
+	if p.StartZoneID.Valid {
+		result["StartZoneID"] = p.StartZoneID.Int64
+	}
+
+	return json.Marshal(result)
 }
 
 // AEID is an AumEntityID

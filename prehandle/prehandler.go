@@ -8,8 +8,6 @@ import (
 
 	"time"
 
-	"encoding/base64"
-
 	"github.com/artificial-universe-maker/go-utilities"
 	"github.com/artificial-universe-maker/go-utilities/myerrors"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -47,16 +45,16 @@ func roundD(val float64) int64 {
 	return int64(val)
 }
 
-// JWT ensures that the X-Token JWT does exist and is valid
+// JWT ensures that the x-token JWT does exist and is valid
 func JWT(w http.ResponseWriter, r *http.Request) bool {
-	tkn := r.Header.Get("X-Token")
+	tkn := r.Header.Get("x-token")
 
 	token, err := utilities.ParseJTWClaims(tkn)
 	if err != nil {
 		myerrors.Respond(w, &myerrors.MySimpleError{
 			Req:     r,
-			Code:    http.StatusBadRequest,
-			Message: err.Error(),
+			Code:    http.StatusUnauthorized,
+			Message: "JWT_INVALID",
 		})
 		return false
 	}
@@ -64,8 +62,8 @@ func JWT(w http.ResponseWriter, r *http.Request) bool {
 	if err != nil {
 		myerrors.Respond(w, &myerrors.MySimpleError{
 			Req:     r,
-			Code:    http.StatusBadRequest,
-			Message: err.Error(),
+			Code:    http.StatusUnauthorized,
+			Message: "JWT_INVALID",
 		})
 		return false
 	}
@@ -80,25 +78,13 @@ func JWT(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp": time.Now().Add(time.Minute * 6000).Unix(),
-		"id":  token["id"],
+		"exp":  time.Now().Add(time.Minute * 6000).Unix(),
+		"data": token["data"],
 	})
 
 	tokenString, err := newToken.SignedString([]byte(os.Getenv("JWT_KEY")))
 
-	decodedUser, err := base64.StdEncoding.DecodeString(token["User"].(string))
-	if err != nil {
-		myerrors.Respond(w, &myerrors.MySimpleError{
-			Req:     r,
-			Code:    http.StatusBadRequest,
-			Message: err.Error(),
-		})
-		return false
-	}
-
-	r.Header.Set("X-User", string(decodedUser))
-
-	w.Header().Set("X-Token", tokenString)
+	w.Header().Set("x-token", tokenString)
 	return true
 }
 
@@ -126,7 +112,7 @@ func RequireBody(limit int64) Prehandler {
 			return false
 		}
 
-		r.Header.Set("X-Body", string(body))
+		r.Header.Set("x-Body", string(body))
 
 		return true
 	}
