@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"encoding/json"
 	"time"
 
 	"github.com/go-gorp/gorp"
@@ -33,7 +32,7 @@ type AumProject struct {
 	Notes  []AumNote  `db:"-"`
 }
 
-func (p AumProject) MarshalJSON() ([]byte, error) {
+func (p AumProject) PrepareMarshal() map[string]interface{} {
 	result := map[string]interface{}{
 		"Title":     p.Title,
 		"CreatedAt": p.CreatedAt.Time,
@@ -43,7 +42,7 @@ func (p AumProject) MarshalJSON() ([]byte, error) {
 		result["StartZoneID"] = p.StartZoneID.Int64
 	}
 
-	return json.Marshal(result)
+	return result
 }
 
 // AEID is an AumEntityID
