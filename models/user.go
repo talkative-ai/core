@@ -13,10 +13,10 @@ type User struct {
 	GivenName   string
 	FamilyName  string
 	Email       string
-	Image       string
-	Password    string `json:",omitempty" db:"-"`
-	PasswordSHA string `json:"-"`
-	Salt        string `json:"-"`
+	Image       sql.NullString
+	Password    sql.NullString `json:",omitempty" db:"-"`
+	PasswordSHA sql.NullString `json:"-"`
+	Salt        sql.NullString `json:"-"`
 }
 
 // Team model relates multiple users under the same umbrella
