@@ -29,20 +29,26 @@ func CompiledEntity(pubID uint64, entityID models.AEID, uniqueID uint64) string 
 	return fmt.Sprintf("%v:%v:e:%v:%v", compiledNamespaceV1(), pubID, entityID, uniqueID)
 }
 
-// CompiledDialogRootWithinZone generates the key for a dialog root node within a zone
-// Notice that we're not using a node ID. This is because the list of nodes within a zone
+// CompiledDialogRootWithinActor generates the key for a dialog root node within a actor
+// Notice that we're not using a node ID. This is because the list of nodes within a actor
 // are not readily available, for performance reasons.
-func CompiledDialogRootWithinZone(pubID, zoneID uint64) string {
+func CompiledDialogRootWithinActor(pubID, actorID uint64) string {
 	return fmt.Sprintf("%v:e:%v:i",
-		CompiledEntity(pubID, models.AEIDZone, zoneID),
+		CompiledEntity(pubID, models.AEIDActor, actorID),
 		models.AEIDDialogNode)
 }
 
-// CompiledDialogNodeWithinZone generates the key for a dialog node within a zone
-func CompiledDialogNodeWithinZone(pubID, zoneID, parentDialogID uint64) string {
+// CompiledDialogNodeWithinActor generates the key for a dialog node within a actor
+func CompiledDialogNodeWithinActor(pubID, actorID, parentDialogID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v:i",
-		CompiledEntity(pubID, models.AEIDZone, zoneID),
+		CompiledEntity(pubID, models.AEIDActor, actorID),
 		models.AEIDDialogNode, parentDialogID)
+}
+
+func CompiledActorsWithinZone(pubID, zoneID uint64) string {
+	return fmt.Sprintf("%v:e:%v",
+		CompiledEntity(pubID, models.AEIDZone, zoneID),
+		models.AEIDActor)
 }
 
 // CompiledDialogNodeActionBundle generates the key for

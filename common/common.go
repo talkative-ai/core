@@ -27,10 +27,17 @@ func RedisHSET(key, field string, bytes []byte) RedisCommand {
 	}
 }
 
+func RedisSADD(key string, members ...interface{}) RedisCommand {
+	return func(redis *redis.Client) {
+		redis.SAdd(key, members...)
+	}
+}
+
 type ProjectItem struct {
 	ProjectID            uint64
 	Title                string
 	ZoneID               uint64
+	ActorID              uint64
 	DialogID             uint64
 	DialogEntry          StringArray
 	ParentDialogID       uint64
