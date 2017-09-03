@@ -38,6 +38,7 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 		"ID":        p.ID,
 		"Title":     p.Title,
 		"CreatedAt": p.CreatedAt.Time,
+		"Zones":     p.Zones,
 	}
 
 	if p.StartZoneID.Valid {
@@ -121,6 +122,7 @@ type AumActor struct {
 type AumZone struct {
 	AumModel
 
+	ProjectID   uint64 `json:"-"`
 	Title       string
 	Description string
 	Actors      []uint64      `json:"Actors,omitempty"`
