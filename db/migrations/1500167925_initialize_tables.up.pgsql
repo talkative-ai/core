@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS workbench_logical_set (
 );
 CREATE TABLE IF NOT EXISTS workbench_dialog_nodes (
     "ID" BIGSERIAL PRIMARY KEY,
-    "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
+    "ActorID" BIGINT NOT NULL REFERENCES workbench_actors("ID"),
     "Entry" TEXT[],
     "LogicalSetID" BIGINT NOT NULL REFERENCES workbench_logical_set("ID")
         ON DELETE CASCADE
@@ -80,6 +80,12 @@ CREATE TABLE IF NOT EXISTS workbench_dialog_nodes (
 CREATE TABLE IF NOT EXISTS workbench_dialog_nodes_relations (
     "ParentNodeID" BIGINT NOT NULL REFERENCES workbench_dialog_nodes("ID"),
     "ChildNodeID" BIGINT NOT NULL REFERENCES workbench_dialog_nodes("ID")
+);
+
+CREATE TABLE IF NOT EXISTS workbench_zones_actors (
+    "ID" BIGSERIAL PRIMARY KEY,
+    "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
+    "ActorID" BIGINT NOT NULL REFERENCES workbench_actors("ID")
 );
 
 -- Gameplay event sourcing tables

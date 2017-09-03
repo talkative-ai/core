@@ -74,7 +74,7 @@ type AumDialogNode struct {
 	AumModel
 
 	ProjectID   uint64
-	ZoneID      uint64
+	ActorID     uint64
 	EntryInput  []AumDialogInput
 	LogicalSet  RawLBlock
 	ChildNodes  *[]*AumDialogNode `db:"-"`
