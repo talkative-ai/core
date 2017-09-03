@@ -10,6 +10,7 @@ import (
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
 	ID        uint64        `db:"ID, primarykey, autoincrement"`
+	CreateID  *int          `db:"-" json:",omitempty"`
 	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
 }
 
@@ -120,6 +121,7 @@ type AumActor struct {
 type AumZone struct {
 	AumModel
 
+	Title       string
 	Description string
 	Actors      []uint64      `json:"Actors,omitempty"`
 	LinkedZones []AumZoneLink `json:"LinkedZones,omitempty"`
