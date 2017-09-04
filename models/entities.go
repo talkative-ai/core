@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/artificial-universe-maker/go-utilities/common"
 	"github.com/go-gorp/gorp"
 )
 
@@ -126,9 +127,10 @@ type AumActor struct {
 }
 
 type AumMinimalDialogNode struct {
-	ID     string
-	Entry  string
-	Always AlwaysMap
+	ID           string
+	LogicalSetID uint64
+	Entry        common.StringArray
+	Always       AlwaysMap
 }
 
 type AlwaysMap map[string][]map[string]interface{}

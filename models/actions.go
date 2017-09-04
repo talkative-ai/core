@@ -29,7 +29,7 @@ const (
 // These actions either mutate the runtime state or mutate the output dialog
 type AumActionSet struct {
 	SetGlobalVariables    map[int32]string
-	PlaySounds            []ARAPlaySound `json:"play_sounds"`
+	PlaySounds            []ARAPlaySound
 	InitializeActorDialog int32
 	SetZone               int32
 	ResetGame             bool
@@ -98,8 +98,8 @@ const (
 // ARAPlaySound AumRuntimeAction PlaySound
 // This action mutates the OutputSSML of the AumMutableRuntimeState
 type ARAPlaySound struct {
-	SoundType ARAPlaySoundType `json:"sound_type"`
-	Value     interface{}      `json:"value"`
+	SoundType ARAPlaySoundType
+	Value     interface{}
 }
 
 // GetAAID returns the AumActionID of the current RuntimeAction

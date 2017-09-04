@@ -2,6 +2,7 @@ DROP TABLE users CASCADE;
 DROP TABLE teams CASCADE;
 DROP TABLE team_members CASCADE;
 DROP TABLE workbench_projects CASCADE;
+DROP TABLE workbench_zones_actors CASCADE;
 DROP TABLE workbench_actors CASCADE;
 DROP TABLE workbench_zones CASCADE;
 DROP TABLE workbench_triggers CASCADE;
