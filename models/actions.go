@@ -54,8 +54,15 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 // It contains the current State of the running game / project (called the runtime state)
 // and the OutputSSML, Speech-synthesis markup language
 type AumMutableRuntimeState struct {
-	State      map[string]interface{}
+	State      MutableRuntimeState
 	OutputSSML ssml.Builder
+}
+
+type MutableRuntimeState struct {
+	Zone          string
+	PubID         string
+	CurrentDialog *string
+	ZoneActors    map[string][]string
 }
 
 // AumRuntimeAction is an interface for all the actions within an AumActionSet

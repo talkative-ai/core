@@ -16,7 +16,7 @@ var DBMap *gorp.DbMap
 // InitializeDB will setup the DB connection
 func InitializeDB() error {
 	var err error
-	Instance, err = sqlx.Connect("postgres", "user=postgres dbname=postgres host=postgres sslmode=disable")
+	Instance, err = sqlx.Connect("postgres", "user=postgres dbname=postgres host=localhost sslmode=disable")
 	if err != nil {
 		return err
 	}
