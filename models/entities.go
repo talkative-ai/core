@@ -28,17 +28,20 @@ type AumProject struct {
 	TeamID      uint64
 	StartZoneID sql.NullInt64 // Expected Zone ID
 
-	Actors []AumActor `db:"-"`
-	Zones  []AumZone  `db:"-"`
-	Notes  []AumNote  `db:"-"`
+	Actors     []AumActor     `db:"-"`
+	Zones      []AumZone      `db:"-"`
+	ZoneActors []AumZoneActor `db:"-"`
+	Notes      []AumNote      `db:"-"`
 }
 
 func (p AumProject) PrepareMarshal() map[string]interface{} {
 	result := map[string]interface{}{
-		"ID":        p.ID,
-		"Title":     p.Title,
-		"CreatedAt": p.CreatedAt.Time,
-		"Zones":     p.Zones,
+		"ID":         p.ID,
+		"Title":      p.Title,
+		"CreatedAt":  p.CreatedAt.Time,
+		"Zones":      p.Zones,
+		"Actors":     p.Actors,
+		"ZoneActors": p.ZoneActors,
 	}
 
 	if p.StartZoneID.Valid {
@@ -114,8 +117,10 @@ const (
 type AumActor struct {
 	AumModel
 
-	Title   string
-	Dialogs []AumDialogNode
+	Title     string
+	ProjectID uint64  `json:"-"`
+	ZoneID    *uint64 `json:",omitempty" db:"-"`
+	Dialogs   []AumDialogNode
 }
 
 // AumZone model for the Zone entities
@@ -125,8 +130,12 @@ type AumZone struct {
 	ProjectID   uint64 `json:"-"`
 	Title       string
 	Description string
-	Actors      []uint64      `json:"Actors,omitempty"`
 	LinkedZones []AumZoneLink `json:"LinkedZones,omitempty"`
+}
+
+type AumZoneActor struct {
+	ZoneID  uint64
+	ActorID uint64
 }
 
 // AumZoneLink explicitly linked zones

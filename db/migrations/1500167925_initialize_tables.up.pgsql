@@ -83,7 +83,6 @@ CREATE TABLE IF NOT EXISTS workbench_dialog_nodes_relations (
 );
 
 CREATE TABLE IF NOT EXISTS workbench_zones_actors (
-    "ID" BIGSERIAL PRIMARY KEY,
     "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
     "ActorID" BIGINT NOT NULL REFERENCES workbench_actors("ID")
 );
