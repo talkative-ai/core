@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"encoding/json"
 	"time"
 
 	"github.com/go-gorp/gorp"
@@ -118,9 +120,26 @@ type AumActor struct {
 	AumModel
 
 	Title     string
-	ProjectID uint64  `json:"-"`
-	ZoneID    *uint64 `json:",omitempty" db:"-"`
-	Dialogs   []AumDialogNode
+	ProjectID uint64                 `json:"-"`
+	ZoneID    *uint64                `json:",omitempty" db:"-"`
+	Dialogs   []AumMinimalDialogNode `json:",omitempty" db:"-"`
+}
+
+type AumMinimalDialogNode struct {
+	ID     string
+	Entry  string
+	Always AlwaysMap
+}
+
+type AlwaysMap map[string][]map[string]interface{}
+
+func (arr *AlwaysMap) Value() (driver.Value, error) {
+	return *arr, nil
+}
+
+func (arr *AlwaysMap) Scan(src interface{}) error {
+	json.Unmarshal(src.([]byte), &arr)
+	return nil
 }
 
 // AumZone model for the Zone entities
