@@ -120,10 +120,11 @@ const (
 type AumActor struct {
 	AumModel
 
-	Title     string
-	ProjectID uint64                 `json:"-"`
-	ZoneID    *uint64                `json:",omitempty" db:"-"`
-	Dialogs   []AumMinimalDialogNode `json:",omitempty" db:"-"`
+	Title           string
+	ProjectID       uint64                 `json:"-"`
+	ZoneID          *uint64                `json:",omitempty" db:"-"`
+	Dialogs         []AumMinimalDialogNode `json:",omitempty" db:"-"`
+	DialogRelations []AumDialogRelation    `json:",omitempty" db:"-"`
 }
 
 type AumMinimalDialogNode struct {
@@ -131,6 +132,11 @@ type AumMinimalDialogNode struct {
 	LogicalSetID uint64
 	Entry        common.StringArray
 	Always       AlwaysMap
+}
+
+type AumDialogRelation struct {
+	ParentNodeID uint64
+	ChildNodeID  uint64
 }
 
 type AlwaysMap map[string][]map[string]interface{}
