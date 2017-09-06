@@ -7,7 +7,6 @@ DROP TABLE workbench_actors CASCADE;
 DROP TABLE workbench_zones CASCADE;
 DROP TABLE workbench_triggers CASCADE;
 DROP TABLE workbench_notes CASCADE;
-DROP TABLE workbench_logical_set CASCADE;
 DROP TABLE workbench_dialog_nodes_relations CASCADE;
 DROP TABLE workbench_dialog_nodes CASCADE;
 DROP TABLE event_user_action CASCADE;

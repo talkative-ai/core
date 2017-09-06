@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"net/url"
 
 	"github.com/artificial-universe-maker/go-ssml"
@@ -33,6 +34,10 @@ type AumActionSet struct {
 	InitializeActorDialog int32
 	SetZone               int32
 	ResetGame             bool
+}
+
+func (a *AumActionSet) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
 }
 
 // Iterable will output all of the AumRuntimeActions within the AumActionSet
@@ -99,7 +104,7 @@ const (
 // This action mutates the OutputSSML of the AumMutableRuntimeState
 type ARAPlaySound struct {
 	SoundType ARAPlaySoundType
-	Value     interface{}
+	Val       interface{}
 }
 
 // GetAAID returns the AumActionID of the current RuntimeAction
@@ -124,10 +129,10 @@ func (ara ARAPlaySound) Compile() []byte {
 	compiled = append(compiled, byte(ara.SoundType))
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		compiled = append(compiled, []byte(ara.Value.(string))...)
+		compiled = append(compiled, []byte(ara.Val.(string))...)
 		break
 	case ARAPlaySoundTypeAudio:
-		compiled = append(compiled, []byte(ara.Value.(*url.URL).String())...)
+		compiled = append(compiled, []byte(ara.Val.(*url.URL).String())...)
 		break
 	}
 
@@ -145,10 +150,10 @@ func (ara ARAPlaySound) Compile() []byte {
 func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		state.OutputSSML = state.OutputSSML.Text(ara.Value.(string))
+		state.OutputSSML = state.OutputSSML.Text(ara.Val.(string))
 		break
 	case ARAPlaySoundTypeAudio:
-		state.OutputSSML = state.OutputSSML.Audio(ara.Value.(*url.URL))
+		state.OutputSSML = state.OutputSSML.Audio(ara.Val.(*url.URL))
 		break
 	}
 }
@@ -160,11 +165,11 @@ func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 	bytes = bytes[1:]
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		ara.Value = string(bytes[:])
+		ara.Val = string(bytes[:])
 		break
 	case ARAPlaySoundTypeAudio:
 		var err error
-		ara.Value, err = url.Parse(string(bytes[:]))
+		ara.Val, err = url.Parse(string(bytes[:]))
 		if err != nil {
 			return err
 		}

@@ -2,11 +2,9 @@ package models
 
 import (
 	"database/sql"
-	"database/sql/driver"
 	"encoding/json"
 	"time"
 
-	"github.com/artificial-universe-maker/go-utilities/common"
 	"github.com/go-gorp/gorp"
 )
 
@@ -79,12 +77,17 @@ const (
 type AumDialogNode struct {
 	AumModel
 
-	ProjectID   uint64
-	ActorID     uint64
-	EntryInput  []AumDialogInput
-	LogicalSet  RawLBlock
-	ChildNodes  *[]*AumDialogNode `db:"-"`
-	ParentNodes *[]*AumDialogNode `db:"-"`
+	IsRoot     bool
+	ProjectID  uint64 `json:"-"`
+	ActorID    uint64 `json:"-"`
+	EntryInput AumDialogInputArray
+	RawLBlock
+	ChildNodes  *[]*AumDialogNode `db:"-" json:"-"`
+	ParentNodes *[]*AumDialogNode `db:"-" json:"-"`
+}
+
+func (a *AumDialogNode) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
 }
 
 // AumDialogInput indicates valid dialog entry types
@@ -92,6 +95,18 @@ type AumDialogNode struct {
 // Greeting (Example: “Hello <Actor>”)
 // Provides an Actor
 type AumDialogInput string
+type AumDialogInputArray []AumDialogInput
+
+func (a *AumDialogInputArray) Scan(src interface{}) error {
+	arr := []string{}
+	json.Unmarshal(src.([]byte), &arr)
+	newA := make(AumDialogInputArray, len(arr))
+	for idx, v := range arr {
+		newA[idx] = AumDialogInput(v)
+	}
+	a = &newA
+	return nil
+}
 
 const (
 	// AumDialogInputStatementVerb Verb statement
@@ -121,33 +136,15 @@ type AumActor struct {
 	AumModel
 
 	Title           string
-	ProjectID       uint64                 `json:"-"`
-	ZoneID          *uint64                `json:",omitempty" db:"-"`
-	Dialogs         []AumMinimalDialogNode `json:",omitempty" db:"-"`
-	DialogRelations []AumDialogRelation    `json:",omitempty" db:"-"`
-}
-
-type AumMinimalDialogNode struct {
-	ID           string
-	LogicalSetID uint64
-	Entry        common.StringArray
-	Always       AlwaysMap
+	ProjectID       uint64              `json:"-"`
+	ZoneID          *uint64             `json:",omitempty" db:"-"`
+	Dialogs         []AumDialogNode     `json:",omitempty" db:"-"`
+	DialogRelations []AumDialogRelation `json:",omitempty" db:"-"`
 }
 
 type AumDialogRelation struct {
 	ParentNodeID uint64
 	ChildNodeID  uint64
-}
-
-type AlwaysMap map[string][]map[string]interface{}
-
-func (arr *AlwaysMap) Value() (driver.Value, error) {
-	return *arr, nil
-}
-
-func (arr *AlwaysMap) Scan(src interface{}) error {
-	json.Unmarshal(src.([]byte), &arr)
-	return nil
 }
 
 // AumZone model for the Zone entities

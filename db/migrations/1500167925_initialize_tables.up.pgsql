@@ -64,17 +64,14 @@ CREATE TABLE IF NOT EXISTS workbench_notes (
     "Content" TEXT,
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
-CREATE TABLE IF NOT EXISTS workbench_logical_set (
-    "ID" BIGSERIAL PRIMARY KEY,
-    "Always" JSONB,
-    "Statements" JSONB
-);
+
 CREATE TABLE IF NOT EXISTS workbench_dialog_nodes (
     "ID" BIGSERIAL PRIMARY KEY,
     "ActorID" BIGINT NOT NULL REFERENCES workbench_actors("ID"),
-    "Entry" TEXT[],
-    "LogicalSetID" BIGINT NOT NULL REFERENCES workbench_logical_set("ID")
-        ON DELETE CASCADE
+    "EntryInput" TEXT[],
+    "AlwaysExec" JSONB,
+    "Statements" JSONB,
+    "IsRoot" BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS workbench_dialog_nodes_relations (
