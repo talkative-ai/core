@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/artificial-universe-maker/go-utilities/common"
 	"github.com/go-gorp/gorp"
 )
 
@@ -98,13 +99,16 @@ type AumDialogInput string
 type AumDialogInputArray []AumDialogInput
 
 func (a *AumDialogInputArray) Scan(src interface{}) error {
-	arr := []string{}
-	json.Unmarshal(src.([]byte), &arr)
-	newA := make(AumDialogInputArray, len(arr))
-	for idx, v := range arr {
+	arr := common.StringArray{}
+	err := arr.Scan(src)
+	if err != nil {
+		return err
+	}
+	newA := make(AumDialogInputArray, len(arr.Val))
+	for idx, v := range arr.Val {
 		newA[idx] = AumDialogInput(v)
 	}
-	a = &newA
+	*a = newA
 	return nil
 }
 
