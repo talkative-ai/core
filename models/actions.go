@@ -47,6 +47,7 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 	ch := make(chan AumRuntimeAction)
 	go func() {
 		defer close(ch)
+		// TODO: Add other actions in here
 		for _, r := range AAS.PlaySounds {
 			action := r
 			ch <- &action

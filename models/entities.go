@@ -2,7 +2,10 @@ package models
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/artificial-universe-maker/go-utilities/common"
@@ -110,6 +113,15 @@ func (a *AumDialogInputArray) Scan(src interface{}) error {
 	}
 	*a = newA
 	return nil
+}
+
+func (arr *AumDialogInputArray) Value() (driver.Value, error) {
+	v := []string{}
+	for _, a := range *arr {
+		v = append(v, string(a))
+	}
+	s := strings.Join(v, ",")
+	return fmt.Sprintf("{%v}", s), nil
 }
 
 const (

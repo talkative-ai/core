@@ -1,8 +1,8 @@
 package common
 
 import (
-	"database/sql"
 	"database/sql/driver"
+	"log"
 	"strings"
 
 	"github.com/go-redis/redis"
@@ -17,34 +17,32 @@ type RedisCommand func(redis *redis.Client)
 
 func RedisSET(key string, bytes []byte) RedisCommand {
 	return func(redis *redis.Client) {
-		redis.Set(key, bytes, 0)
+		result := redis.Set(key, bytes, 0)
+		if err := result.Err(); err != nil {
+			log.SetFlags(log.Llongfile)
+			log.Println("Redis command error", err.Error())
+		}
 	}
 }
 
 func RedisHSET(key, field string, bytes []byte) RedisCommand {
 	return func(redis *redis.Client) {
-		redis.HSet(key, field, bytes)
+		result := redis.HSet(key, field, bytes)
+		if err := result.Err(); err != nil {
+			log.SetFlags(log.Llongfile)
+			log.Println("Redis command error", err.Error())
+		}
 	}
 }
 
 func RedisSADD(key string, members ...interface{}) RedisCommand {
 	return func(redis *redis.Client) {
-		redis.SAdd(key, members...)
+		result := redis.SAdd(key, members...)
+		if err := result.Err(); err != nil {
+			log.SetFlags(log.Llongfile)
+			log.Println("Redis command error", err.Error())
+		}
 	}
-}
-
-type ProjectItem struct {
-	ProjectID            uint64
-	Title                string
-	ZoneID               uint64
-	ActorID              uint64
-	DialogID             uint64
-	DialogEntry          StringArray
-	ParentDialogID       uint64
-	ChildDialogID        uint64
-	LogicalSetAlways     string
-	LogicalSetStatements sql.NullString
-	LogicalSetID         uint64
 }
 
 type StringArray struct {

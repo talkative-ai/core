@@ -27,7 +27,7 @@ func InitializeDB() error {
 	DBMap.AddTableWithName(models.AumZone{}, "workbench_zones")
 	DBMap.AddTableWithName(models.AumActor{}, "workbench_actors")
 	DBMap.AddTableWithName(models.AumZoneActor{}, "workbench_zones_actors")
-	DBMap.AddTableWithName(models.AumDialogNode{}, "workbench_dialogs")
+	DBMap.AddTableWithName(models.AumDialogNode{}, "workbench_dialog_nodes")
 	DBMap.AddTableWithName(models.AumNote{}, "workbench_notes")
 
 	DBMap.AddTableWithName(models.User{}, "users")
