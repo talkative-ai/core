@@ -118,8 +118,9 @@ func (a *AumDialogInputArray) Scan(src interface{}) error {
 func (arr *AumDialogInputArray) Value() (driver.Value, error) {
 	v := []string{}
 	for _, a := range *arr {
-		v = append(v, string(a))
+		v = append(v, fmt.Sprintf("\"%v\"", string(a)))
 	}
+
 	s := strings.Join(v, ",")
 	return fmt.Sprintf("{%v}", s), nil
 }
