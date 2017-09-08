@@ -73,5 +73,5 @@ func (br *ByteReader) ReadByte() (byte, error) {
 }
 
 func (br *ByteReader) Finished() bool {
-	return int(br.Position) >= br.Reader.Len()
+	return br.Reader.Len() <= 0
 }
