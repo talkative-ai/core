@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql/driver"
 	"encoding/binary"
 	"encoding/json"
 	"net/url"
@@ -38,6 +39,10 @@ type AumActionSet struct {
 
 func (a *AumActionSet) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)
+}
+
+func (a *AumActionSet) Value() (driver.Value, error) {
+	return json.Marshal(a)
 }
 
 // Iterable will output all of the AumRuntimeActions within the AumActionSet
@@ -151,7 +156,7 @@ func (ara ARAPlaySound) Compile() []byte {
 func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		state.OutputSSML = state.OutputSSML.Text(ara.Val.(string))
+		state.OutputSSML = state.OutputSSML.Paragraph(ara.Val.(string))
 		break
 	case ARAPlaySoundTypeAudio:
 		state.OutputSSML = state.OutputSSML.Audio(ara.Val.(*url.URL))
@@ -166,11 +171,11 @@ func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 	bytes = bytes[1:]
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		ara.Val = string(bytes[:])
+		ara.Val = string(bytes)
 		break
 	case ARAPlaySoundTypeAudio:
 		var err error
-		ara.Val, err = url.Parse(string(bytes[:]))
+		ara.Val, err = url.Parse(string(bytes))
 		if err != nil {
 			return err
 		}

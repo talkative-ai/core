@@ -1,5 +1,10 @@
 package models
 
+import (
+	"database/sql/driver"
+	"encoding/json"
+)
+
 // LBlock is the RawLBlock after AumActionSet has been bundled
 type LBlock struct {
 	// AlwaysExec are actions that have no conditions
@@ -35,7 +40,17 @@ type LStatement struct {
 // RawLBlock contains every execution block
 type RawLBlock struct {
 	AlwaysExec AumActionSet
-	Statements *[][]RawLStatement
+	Statements *RawLStatementUnified
+}
+
+type RawLStatementUnified [][]RawLStatement
+
+func (a *RawLStatementUnified) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
+}
+
+func (a *RawLStatementUnified) Value() (driver.Value, error) {
+	return json.Marshal(a)
 }
 
 // RawLStatement contains an OrGroup of AndGroups

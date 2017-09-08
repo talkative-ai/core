@@ -88,6 +88,7 @@ type AumDialogNode struct {
 	RawLBlock
 	ChildNodes  *[]*AumDialogNode `db:"-" json:"-"`
 	ParentNodes *[]*AumDialogNode `db:"-" json:"-"`
+	ParentID    *uint64
 }
 
 func (a *AumDialogNode) Scan(src interface{}) error {
