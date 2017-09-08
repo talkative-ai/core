@@ -50,6 +50,9 @@ func (a *RawLStatementUnified) Scan(src interface{}) error {
 }
 
 func (a *RawLStatementUnified) Value() (driver.Value, error) {
+	if a == nil {
+		return nil, nil
+	}
 	return json.Marshal(a)
 }
 
