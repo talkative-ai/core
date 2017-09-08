@@ -1,8 +1,8 @@
 version: "3"
 
 services:
-  shiva-dev:
-    image: aum-shiva-dev
+  shiva:
+    image: aum-shiva
     build:
       dockerfile: Dockerfile-dev
       context: ../shiva
@@ -15,7 +15,7 @@ services:
       - "postgres"
     env_file:
       - .env
-  lakshmi-dev:
+  lakshmi:
     image: aum-lakshmi-dev
     build:
       context: ../lakshmi
@@ -25,6 +25,20 @@ services:
       - ../lakshmi:/go/src/github.com/artificial-universe-maker/lakshmi:ro
     ports:
       - 8042:8080
+    depends_on:
+      - "postgres"
+    env_file:
+      - .env
+  brahman:
+    image: aum-brahman-dev
+    build:
+      context: ../brahman
+      dockerfile: Dockerfile-dev
+    volumes:
+      - $GOPATH:/go:ro
+      - ../brahman:/go/src/github.com/artificial-universe-maker/lakshmi:ro
+    ports:
+      - 9001:8085
     depends_on:
       - "postgres"
     env_file:
