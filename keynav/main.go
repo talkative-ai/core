@@ -80,3 +80,10 @@ func ProjectMetadataDynamic(pubID uint64) string {
 func GlobalMetaProjects() string {
 	return fmt.Sprintf("%v:live:projects", compiledNamespaceV1())
 }
+
+// TODO: Consider if this can be helpful for event sourcing
+// i.e. capture every action bundle that mutates states
+func ParseFromKeyBundleID(key string) string {
+	fmt.Println(key)
+	return ""
+}

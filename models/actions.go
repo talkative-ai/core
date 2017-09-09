@@ -76,6 +76,10 @@ type MutableRuntimeState struct {
 	ZoneActors    map[string][]string
 }
 
+func (a *MutableRuntimeState) Value() (driver.Value, error) {
+	return json.Marshal(a)
+}
+
 // AumRuntimeAction is an interface for all the actions within an AumActionSet
 // Combined with the AumActionSet Iterable(), compilation is easy
 type AumRuntimeAction interface {
