@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message PublishRequest {
+  uint64 project_id = 1;
+}
+
+message PublishResponse {
+  PublishRequestStatus status = 1;
+}
+
+enum PublishRequestStatus {
+  RECIEVED = 0;
+  FAILED = 1;
+}
+
+service Lakshmi {
+  rpc PublishProject(PublishRequest) returns (PublishRequest) {}
+}
