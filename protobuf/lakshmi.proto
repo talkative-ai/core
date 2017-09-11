@@ -9,8 +9,8 @@ message PublishResponse {
 }
 
 enum PublishRequestStatus {
-  RECIEVED = 0;
-  FAILED = 1;
+  RECIEVED = 1;
+  FAILED = 2;
 }
 
 service Lakshmi {
