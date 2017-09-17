@@ -4,7 +4,11 @@ import (
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"net/url"
+	"strings"
+
+	"log"
 
 	"github.com/artificial-universe-maker/go-ssml"
 )
@@ -16,7 +20,7 @@ type AumActionID uint64
 
 const (
 	// AAIDSetGlobalVariable AumActionID for SetGlobalVariable
-	AAIDSetGlobalVariable AumActionID = iota
+	AAIDSetARVariable AumActionID = iota
 	// AAIDPlaySound AumActionID for PlaySound
 	AAIDPlaySound
 	// AAIDInitializeActorDialog AumActionID for InitializeActorDialog
@@ -30,10 +34,10 @@ const (
 // AumActionSet is a pre-bundled set of actions
 // These actions either mutate the runtime state or mutate the output dialog
 type AumActionSet struct {
-	SetGlobalVariables    map[int32]string
+	SetGlobalVariables    ARASetVariable
 	PlaySounds            []ARAPlaySound
 	InitializeActorDialog int32
-	SetZone               int32
+	SetZone               ARASetZone
 	ResetGame             bool
 }
 
@@ -74,6 +78,27 @@ type MutableRuntimeState struct {
 	PubID         string
 	CurrentDialog *string
 	ZoneActors    map[string][]string
+	ARVariables   map[string]*ARVariable
+}
+
+type ARVariable struct {
+	T   string
+	Val interface{}
+}
+
+func (arv *ARVariable) Get() interface{} {
+	var v interface{}
+	switch arv.T {
+	case "int":
+		v = arv.Val.(int)
+	case "bool":
+		v = arv.Val.(bool)
+	case "array":
+		v = arv.Val.([]ARVariable)
+	default:
+		v = fmt.Sprintf("%+v", arv.Val)
+	}
+	return v
 }
 
 func (a *MutableRuntimeState) Value() (driver.Value, error) {
@@ -117,25 +142,32 @@ type ARAPlaySound struct {
 	Val       interface{}
 }
 
-// GetAAID returns the AumActionID of the current RuntimeAction
-func (ara ARAPlaySound) GetAAID() AumActionID {
-	return AAIDPlaySound
-}
-
 func GetActionFromID(id AumActionID) AumRuntimeAction {
 	switch id {
 	case AAIDPlaySound:
 		return &ARAPlaySound{}
+	case AAIDSetZone:
+		n := ARASetZone(0)
+		return &n
 	default:
 		return nil
 	}
 }
 
+//////////////////
+// ARAPlaySound //
+//////////////////
+
+// GetAAID returns the AumActionID of the current RuntimeAction
+func (ara ARAPlaySound) GetAAID() AumActionID {
+	return AAIDPlaySound
+}
+
 // Compile is used by Lakshmi
 // Returns the compiled []byte slice of the runtime action
+// To be stored in Redis
 func (ara ARAPlaySound) Compile() []byte {
 	compiled := []byte{}
-	b := make([]byte, 4)
 	compiled = append(compiled, byte(ara.SoundType))
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
@@ -146,30 +178,11 @@ func (ara ARAPlaySound) Compile() []byte {
 		break
 	}
 
-	b = make([]byte, 4)
-	binary.LittleEndian.PutUint32(b, uint32(len(compiled)))
-	finished := []byte{}
-	finished = append(finished, b...)
-	finished = append(finished, compiled...)
-
-	return finished
-}
-
-// Execute will mutate the AumMutableRuntimeState in some way
-// Whether it's the state itself or the OutputSSML
-func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
-	switch ara.SoundType {
-	case ARAPlaySoundTypeText:
-		state.OutputSSML = state.OutputSSML.Paragraph(ara.Val.(string))
-		break
-	case ARAPlaySoundTypeAudio:
-		state.OutputSSML = state.OutputSSML.Audio(ara.Val.(*url.URL))
-		break
-	}
+	return compiled
 }
 
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
-// This could be put in a single "Execute" but this way is less monolothic
+// This could be put in a single "Execute" but this is less monolothic
 func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 	ara.SoundType = ARAPlaySoundType(bytes[0])
 	bytes = bytes[1:]
@@ -185,4 +198,234 @@ func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 		}
 	}
 	return nil
+}
+
+// Execute will mutate the AumMutableRuntimeState in some way
+// Whether it's the state itself or the OutputSSML
+func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
+	switch ara.SoundType {
+	case ARAPlaySoundTypeText:
+		state.OutputSSML = state.OutputSSML.Paragraph(ara.Val.(string))
+		break
+	case ARAPlaySoundTypeAudio:
+		state.OutputSSML = state.OutputSSML.Audio(ara.Val.(*url.URL))
+		break
+	}
+}
+
+////////////////
+// ARASetZone //
+////////////////
+type ARASetZone uint64
+
+// GetAAID returns the AumActionID of the current RuntimeAction
+func (ara *ARASetZone) GetAAID() AumActionID {
+	return AAIDSetZone
+}
+
+// Compile is used by Lakshmi
+// Returns the compiled []byte slice of the runtime action
+// To be stored in Redis
+func (ara ARASetZone) Compile() []byte {
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint64(b, uint64(ara))
+	return b
+}
+
+// CreateFrom is used for evaluating the actions in Brahman and followed by Execute
+// This could be put in a single "Execute" but this is less monolothic
+func (ara *ARASetZone) CreateFrom(bytes []byte) error {
+	n := ARASetZone(binary.LittleEndian.Uint64(bytes))
+	ara = &n
+	return nil
+}
+
+// Execute will mutate the AumMutableRuntimeState in some way
+// Whether it's the state itself or the OutputSSML
+func (ara *ARASetZone) Execute(state *AumMutableRuntimeState) {
+	state.State.Zone = fmt.Sprintf("%v", *ara)
+}
+
+////////////////////
+// ARASetVariable //
+////////////////////
+type ARASetVariable []SetVariable
+type SetVariableOperation int
+
+const (
+	// SVOSet is for any
+	SVOSet SetVariableOperation = iota
+
+	// SVOAdd is for int/string
+	SVOAdd
+
+	// SVOSubtract is for int
+	SVOSubtract
+	// SVODivide is for int
+	SVODivide
+	// SVOMultiply is for int
+	SVOMultiply
+	// SVOModulo is for int
+	SVOModulo
+
+	// SVONot is for bool
+	SVONot
+
+	// SVOInsert is for array
+	SVOInsert
+	// SVODelete is for array
+	SVODelete
+
+	// SVOReplace is for string
+	SVOReplace
+)
+
+type SetVariable struct {
+	Target    string
+	Operation SetVariableOperation
+	With      ParametizedARVariable
+}
+
+type ParametizedARVariable struct {
+	// If Key == nil then the variable is inlined
+	Key        *string
+	Params     map[string]interface{}
+	ARVariable *ARVariable
+}
+
+// GetAAID returns the AumActionID of the current RuntimeAction
+func (ara *ARASetVariable) GetAAID() AumActionID {
+	return AAIDSetARVariable
+}
+
+// Compile is used by Lakshmi
+// Returns the compiled []byte slice of the runtime action
+// To be stored in Redis
+func (ara ARASetVariable) Compile() []byte {
+	b := []byte{}
+	return b
+}
+
+// CreateFrom is used for evaluating the actions in Brahman and followed by Execute
+// This could be put in a single "Execute" but this is less monolothic
+func (ara *ARASetVariable) CreateFrom(bytes []byte) error {
+	return nil
+}
+
+// Execute will mutate the AumMutableRuntimeState in some way
+// Whether it's the state itself or the OutputSSML
+func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
+	for _, setvar := range *ara {
+
+		original := state.State.ARVariables[setvar.Target].Get()
+		var n interface{}
+		if setvar.With.Key != nil {
+			n = state.State.ARVariables[*setvar.With.Key].Get()
+		} else {
+			n = setvar.With.ARVariable.Get()
+		}
+		var newval interface{}
+
+		switch setvar.Operation {
+		case SVOSet:
+			if setvar.With.ARVariable.T != state.State.ARVariables[setvar.Target].T {
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+			newval = n
+		case SVOAdd:
+			switch o := original.(type) {
+			case int64:
+				newval = o + n.(int64)
+			case string:
+				newval = fmt.Sprintf("%v%v", o, n.(string))
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVOSubtract:
+			switch o := original.(type) {
+			case int64:
+				newval = o - n.(int64)
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVODivide:
+			switch o := original.(type) {
+			case int64:
+				newval = o / n.(int64)
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVOModulo:
+			switch o := original.(type) {
+			case int64:
+				newval = o % n.(int64)
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVONot:
+			switch o := original.(type) {
+			case bool:
+				newval = !o
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVOInsert:
+			index := setvar.With.Params["Index"].(int)
+			switch o := original.(type) {
+			case []ARVariable:
+				newval = []ARVariable{}
+				newval = append(newval.([]ARVariable), o[:index]...)
+				newval = append(newval.([]ARVariable), n.(ARVariable))
+				newval = append(newval.([]ARVariable), o[index:]...)
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVODelete:
+			index := setvar.With.Params["Index"].(int)
+			switch o := original.(type) {
+			case []ARVariable:
+				newval = []ARVariable{}
+				newval = append(o[:index], o[:index+1]...)
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		case SVOReplace:
+			search := setvar.With.Params["Search"].(string)
+			replace := setvar.With.Params["Replace"].(string)
+			switch o := original.(type) {
+			case string:
+				newval = strings.Replace(o, search, replace, 0)
+			default:
+				// TODO: Better error handling here
+				log.SetFlags(log.Llongfile | log.Ltime)
+				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+				continue
+			}
+		}
+		state.State.ARVariables[setvar.Target].Val = newval
+	}
 }
