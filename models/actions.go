@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"log"
@@ -34,7 +35,7 @@ const (
 // AumActionSet is a pre-bundled set of actions
 // These actions either mutate the runtime state or mutate the output dialog
 type AumActionSet struct {
-	SetGlobalVariables    ARASetVariable
+	SetGlobalVariables    []ARASetVariable
 	PlaySounds            []ARAPlaySound
 	InitializeActorDialog int32
 	SetZone               ARASetZone
@@ -205,7 +206,19 @@ func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 	switch ara.SoundType {
 	case ARAPlaySoundTypeText:
-		state.OutputSSML = state.OutputSSML.Paragraph(ara.Val.(string))
+		r, err := regexp.Compile(`{{\w+}}`)
+		v := ara.Val.(string)
+		if err != nil {
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+		newv := r.ReplaceAllFunc([]byte(v), func(b []byte) []byte {
+			v := b[2 : len(b)-2]
+			// TODO: Support array indices
+			val := state.State.ARVariables[string(v)].Val
+			return []byte(fmt.Sprintf("%v", val))
+		})
+		state.OutputSSML = state.OutputSSML.Paragraph(string(newv))
 		break
 	case ARAPlaySoundTypeAudio:
 		state.OutputSSML = state.OutputSSML.Audio(ara.Val.(*url.URL))
@@ -249,7 +262,6 @@ func (ara *ARASetZone) Execute(state *AumMutableRuntimeState) {
 ////////////////////
 // ARASetVariable //
 ////////////////////
-type ARASetVariable []SetVariable
 type SetVariableOperation int
 
 const (
@@ -280,7 +292,7 @@ const (
 	SVOReplace
 )
 
-type SetVariable struct {
+type ARASetVariable struct {
 	Target    string
 	Operation SetVariableOperation
 	With      ParametizedARVariable
@@ -315,117 +327,114 @@ func (ara *ARASetVariable) CreateFrom(bytes []byte) error {
 // Execute will mutate the AumMutableRuntimeState in some way
 // Whether it's the state itself or the OutputSSML
 func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
-	for _, setvar := range *ara {
-
-		original := state.State.ARVariables[setvar.Target].Get()
-		var n interface{}
-		if setvar.With.Key != nil {
-			n = state.State.ARVariables[*setvar.With.Key].Get()
-		} else {
-			n = setvar.With.ARVariable.Get()
-		}
-		var newval interface{}
-
-		switch setvar.Operation {
-		case SVOSet:
-			if setvar.With.ARVariable.T != state.State.ARVariables[setvar.Target].T {
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-			newval = n
-		case SVOAdd:
-			switch o := original.(type) {
-			case int64:
-				newval = o + n.(int64)
-			case string:
-				newval = fmt.Sprintf("%v%v", o, n.(string))
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVOSubtract:
-			switch o := original.(type) {
-			case int64:
-				newval = o - n.(int64)
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVODivide:
-			switch o := original.(type) {
-			case int64:
-				newval = o / n.(int64)
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVOModulo:
-			switch o := original.(type) {
-			case int64:
-				newval = o % n.(int64)
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVONot:
-			switch o := original.(type) {
-			case bool:
-				newval = !o
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVOInsert:
-			index := setvar.With.Params["Index"].(int)
-			switch o := original.(type) {
-			case []ARVariable:
-				newval = []ARVariable{}
-				newval = append(newval.([]ARVariable), o[:index]...)
-				newval = append(newval.([]ARVariable), n.(ARVariable))
-				newval = append(newval.([]ARVariable), o[index:]...)
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVODelete:
-			index := setvar.With.Params["Index"].(int)
-			switch o := original.(type) {
-			case []ARVariable:
-				newval = []ARVariable{}
-				newval = append(o[:index], o[:index+1]...)
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		case SVOReplace:
-			search := setvar.With.Params["Search"].(string)
-			replace := setvar.With.Params["Replace"].(string)
-			switch o := original.(type) {
-			case string:
-				newval = strings.Replace(o, search, replace, 0)
-			default:
-				// TODO: Better error handling here
-				log.SetFlags(log.Llongfile | log.Ltime)
-				log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
-				continue
-			}
-		}
-		state.State.ARVariables[setvar.Target].Val = newval
+	original := state.State.ARVariables[ara.Target].Get()
+	var n interface{}
+	if ara.With.Key != nil {
+		n = state.State.ARVariables[*ara.With.Key].Get()
+	} else {
+		n = ara.With.ARVariable.Get()
 	}
+	var newval interface{}
+
+	switch ara.Operation {
+	case SVOSet:
+		if ara.With.ARVariable.T != state.State.ARVariables[ara.Target].T {
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+		newval = n
+	case SVOAdd:
+		switch o := original.(type) {
+		case int64:
+			newval = o + n.(int64)
+		case string:
+			newval = fmt.Sprintf("%v%v", o, n.(string))
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVOSubtract:
+		switch o := original.(type) {
+		case int64:
+			newval = o - n.(int64)
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVODivide:
+		switch o := original.(type) {
+		case int64:
+			newval = o / n.(int64)
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVOModulo:
+		switch o := original.(type) {
+		case int64:
+			newval = o % n.(int64)
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVONot:
+		switch o := original.(type) {
+		case bool:
+			newval = !o
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVOInsert:
+		index := ara.With.Params["Index"].(int)
+		switch o := original.(type) {
+		case []ARVariable:
+			newval = []ARVariable{}
+			newval = append(newval.([]ARVariable), o[:index]...)
+			newval = append(newval.([]ARVariable), n.(ARVariable))
+			newval = append(newval.([]ARVariable), o[index:]...)
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVODelete:
+		index := ara.With.Params["Index"].(int)
+		switch o := original.(type) {
+		case []ARVariable:
+			newval = []ARVariable{}
+			newval = append(o[:index], o[:index+1]...)
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	case SVOReplace:
+		search := ara.With.Params["Search"].(string)
+		replace := ara.With.Params["Replace"].(string)
+		switch o := original.(type) {
+		case string:
+			newval = strings.Replace(o, search, replace, 0)
+		default:
+			// TODO: Better error handling here
+			log.SetFlags(log.Llongfile | log.Ltime)
+			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			return
+		}
+	}
+	state.State.ARVariables[ara.Target].Val = newval
 }
