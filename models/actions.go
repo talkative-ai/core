@@ -62,6 +62,10 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 			action := r
 			ch <- &action
 		}
+		for _, r := range AAS.SetGlobalVariables {
+			action := r
+			ch <- &action
+		}
 	}()
 	return ch
 }
@@ -150,6 +154,8 @@ func GetActionFromID(id AumActionID) AumRuntimeAction {
 	case AAIDSetZone:
 		n := ARASetZone(0)
 		return &n
+	case AAIDSetARVariable:
+		return &ARASetVariable{}
 	default:
 		return nil
 	}
