@@ -13,8 +13,9 @@ type ProjectItem struct {
 	ActorID              uint64
 	DialogID             uint64
 	DialogEntry          common.StringArray
-	ParentDialogID       uint64
-	ChildDialogID        uint64
+	ParentDialogID       sql.NullInt64
+	ChildDialogID        sql.NullInt64
+	IsRoot               bool
 	LogicalSetAlways     string
 	LogicalSetStatements sql.NullString
 	LogicalSetID         uint64

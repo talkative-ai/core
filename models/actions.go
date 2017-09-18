@@ -66,7 +66,10 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 			action := r
 			ch <- &action
 		}
-		ch <- &AAS.SetZone
+
+		if uint64(AAS.SetZone) != 0 {
+			ch <- &AAS.SetZone
+		}
 	}()
 	return ch
 }
