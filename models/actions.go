@@ -259,7 +259,7 @@ func (ara ARASetZone) Compile() []byte {
 // This could be put in a single "Execute" but this is less monolothic
 func (ara *ARASetZone) CreateFrom(bytes []byte) error {
 	n := ARASetZone(binary.LittleEndian.Uint64(bytes))
-	ara = &n
+	*ara = n
 	return nil
 }
 
@@ -267,6 +267,7 @@ func (ara *ARASetZone) CreateFrom(bytes []byte) error {
 // Whether it's the state itself or the OutputSSML
 func (ara *ARASetZone) Execute(state *AumMutableRuntimeState) {
 	state.State.Zone = fmt.Sprintf("%v", *ara)
+	state.State.CurrentDialog = nil
 }
 
 ////////////////////
