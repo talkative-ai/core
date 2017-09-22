@@ -81,7 +81,7 @@ const (
 type AumDialogNode struct {
 	AumModel
 
-	IsRoot     bool
+	IsRoot     *bool
 	ProjectID  uint64 `json:"-"`
 	ActorID    uint64 `json:"-"`
 	EntryInput AumDialogInputArray
