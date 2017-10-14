@@ -38,7 +38,7 @@ services:
       - $GOPATH:/go:ro
       - ../brahman:/go/src/github.com/artificial-universe-maker/lakshmi:ro
     ports:
-      - 9001:8085
+      - 9001:8080
     depends_on:
       - "postgres"
     env_file:
