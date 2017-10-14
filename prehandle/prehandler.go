@@ -88,10 +88,10 @@ func JWT(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-// RequireBody forces a body to exist with a maximum length limit
+// RequireBody forces a body to exist with a maximum length lim
 // If the body does not exist, an http.StatusBadRequest is returned. This is required for POST requests
 // This prehandler protects against overflows and null-pointer exceptions
-func RequireBody(limit int64) Prehandler {
+func RequireBody(lim int64) Prehandler {
 	return func(w http.ResponseWriter, r *http.Request) bool {
 		if r.Body == nil {
 			myerrors.Respond(w, &myerrors.MySimpleError{
@@ -102,7 +102,7 @@ func RequireBody(limit int64) Prehandler {
 			return false
 		}
 
-		body, err := ioutil.ReadAll(io.LimitReader(r.Body, limit))
+		body, err := ioutil.ReadAll(io.LimitReader(r.Body, lim))
 		if err != nil {
 			myerrors.Respond(w, &myerrors.MySimpleError{
 				Req:     r,
@@ -112,7 +112,16 @@ func RequireBody(limit int64) Prehandler {
 			return false
 		}
 
-		r.Header.Set("x-Body", string(body))
+		if len(body) <= 0 {
+			myerrors.Respond(w, &myerrors.MySimpleError{
+				Req:     r,
+				Code:    http.StatusBadRequest,
+				Message: "EMPTY_BODY",
+			})
+			return false
+		}
+
+		r.Header.Set("X-Body", string(body))
 
 		return true
 	}

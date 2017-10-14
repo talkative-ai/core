@@ -15,6 +15,10 @@ import (
 var Instance *sqlx.DB
 var DBMap *gorp.DbMap
 
+func GetMaxProjects() int {
+	return 3
+}
+
 // InitializeDB will setup the DB connection
 func InitializeDB() error {
 	var err error
