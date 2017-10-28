@@ -15,7 +15,7 @@ import (
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
 	ID        uint64        `db:"ID, primarykey, autoincrement"`
-	CreateID  *int          `db:"-" json:",omitempty"`
+	CreateID  *string       `db:"-" json:",omitempty"`
 	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
 }
 
@@ -88,7 +88,6 @@ type AumDialogNode struct {
 	RawLBlock
 	ChildNodes  *[]*AumDialogNode `db:"-" json:"-"`
 	ParentNodes *[]*AumDialogNode `db:"-" json:"-"`
-	ParentID    *uint64
 }
 
 func (a *AumDialogNode) Scan(src interface{}) error {
@@ -149,6 +148,13 @@ const (
 	AumDialogInputQuestionPossessional AumDialogInput = "question_possessional"
 )
 
+type PatchAction uint8
+
+const (
+	PatchActionCreate PatchAction = iota
+	PatchActionDelete
+)
+
 // AumActor model for the Actor entities
 type AumActor struct {
 	AumModel
@@ -161,8 +167,9 @@ type AumActor struct {
 }
 
 type AumDialogRelation struct {
-	ParentNodeID uint64
-	ChildNodeID  uint64
+	ParentNodeID interface{}
+	ChildNodeID  interface{}
+	PatchAction  *PatchAction `json:",omitempty" db:"-"`
 }
 
 // AumZone model for the Zone entities
