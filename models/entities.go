@@ -161,7 +161,7 @@ type AumActor struct {
 
 	Title           string
 	ProjectID       uint64              `json:"-"`
-	ZoneID          *uint64             `json:",omitempty" db:"-"`
+	ZoneIDs         *[]uint64           `json:",omitempty" db:"-"`
 	Dialogs         []AumDialogNode     `json:",omitempty" db:"-"`
 	DialogRelations []AumDialogRelation `json:",omitempty" db:"-"`
 }
