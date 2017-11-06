@@ -161,7 +161,6 @@ type AumActor struct {
 
 	Title           string
 	ProjectID       uint64              `json:"-"`
-	ZoneIDs         *[]uint64           `json:",omitempty" db:"-"`
 	Dialogs         []AumDialogNode     `json:",omitempty" db:"-"`
 	DialogRelations []AumDialogRelation `json:",omitempty" db:"-"`
 }
@@ -183,8 +182,9 @@ type AumZone struct {
 }
 
 type AumZoneActor struct {
-	ZoneID  uint64
-	ActorID uint64
+	ZoneID      interface{}
+	ActorID     interface{}
+	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
 
 // AumZoneLink explicitly linked zones
