@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"net/url"
 	"testing"
 )
@@ -15,7 +14,7 @@ func TestAumActionSetIterable(t *testing.T) {
 	AAS.PlaySounds[1].Val, _ = url.Parse("https://upload.wikimedia.org/wikipedia/commons/b/bb/Test_ogg_mp3_48kbps.wav")
 
 	for a := range AAS.Iterable() {
-		fmt.Println(a)
+		t.Log(a)
 	}
 
 }

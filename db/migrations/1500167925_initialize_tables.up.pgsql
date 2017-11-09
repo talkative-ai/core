@@ -55,6 +55,7 @@ ALTER TABLE workbench_projects
 CREATE TABLE IF NOT EXISTS workbench_triggers (
     "ID" BIGSERIAL PRIMARY KEY,
     "ProjectID" BIGINT NOT NULL REFERENCES workbench_projects("ID"),
+    "TriggerType" integer NOT NULL,
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS workbench_notes (
@@ -82,6 +83,11 @@ CREATE TABLE IF NOT EXISTS workbench_dialog_nodes_relations (
 CREATE TABLE IF NOT EXISTS workbench_zones_actors (
     "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
     "ActorID" BIGINT NOT NULL REFERENCES workbench_actors("ID")
+);
+
+CREATE TABLE IF NOT EXISTS workbench_zones_triggers (
+    "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
+    "TriggerID" BIGINT NOT NULL REFERENCES workbench_triggers("ID")
 );
 
 -- Gameplay event sourcing tables

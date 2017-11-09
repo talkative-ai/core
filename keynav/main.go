@@ -81,9 +81,26 @@ func GlobalMetaProjects() string {
 	return fmt.Sprintf("%v:live:projects", compiledNamespaceV1())
 }
 
-// TODO: Consider if this can be helpful for event sourcing
+// ParseFromKeyBundleID TODO: Consider if this can be helpful for event sourcing
 // i.e. capture every action bundle that mutates states
 func ParseFromKeyBundleID(key string) string {
 	fmt.Println(key)
 	return ""
+}
+
+// CompiledTriggerActionBundle generates the key for
+// an action bundle within a trigger
+func CompiledTriggerActionBundle(pubID, triggerID, bundleID uint64) string {
+	return fmt.Sprintf("%v:e:%v:%v",
+		CompiledEntity(pubID, models.AEIDTrigger, triggerID),
+		models.AEIDActionBundle, bundleID)
+}
+
+// CompiledTriggersWithinZone generates a key to a hash of all triggers within the zone
+// and their keys therein. Each trigger has an associated action bundle with can be accessed
+// via another read operation.
+func CompiledTriggersWithinZone(pubID, zoneID uint64) string {
+	return fmt.Sprintf("%v:e:%v",
+		CompiledEntity(pubID, models.AEIDZone, zoneID),
+		models.AEIDTrigger)
 }

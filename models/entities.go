@@ -187,6 +187,12 @@ type AumZoneActor struct {
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
 
+type AumZoneTrigger struct {
+	ZoneID      interface{}
+	TriggerID   interface{}
+	PatchAction *PatchAction `json:",omitempty" db:"-"`
+}
+
 // AumZoneLink explicitly linked zones
 type AumZoneLink struct {
 	AumModel
@@ -195,9 +201,20 @@ type AumZoneLink struct {
 	ZoneTo   uint64
 }
 
+type AumTriggerType int
+
+const (
+	AumTriggerInitializeZone AumTriggerType = iota
+	AumTriggerEnterZone
+	AumTriggerExitZone
+	AumTriggerVariableUpdate
+)
+
 // AumTrigger model for Trigger entities
 type AumTrigger struct {
 	AumModel
+	TriggerType AumTriggerType
+	RawLBlock
 }
 
 // AumNote model for the Note entities

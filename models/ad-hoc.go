@@ -21,3 +21,11 @@ type ProjectItem struct {
 	LogicalSetID         uint64
 	RawLBlock
 }
+
+type ProjectTriggerItem struct {
+	ProjectID   uint64
+	ZoneID      uint64
+	TriggerID   uint64
+	TriggerType AumTriggerType
+	RawLBlock
+}

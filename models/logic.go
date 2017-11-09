@@ -38,6 +38,7 @@ type LStatement struct {
 }
 
 // RawLBlock contains every execution block
+// This model is database-friendly and pre-compiled
 type RawLBlock struct {
 	AlwaysExec AumActionSet
 	Statements *RawLStatementUnified
