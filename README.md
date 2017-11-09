@@ -35,19 +35,19 @@ postgres:5432
 adminer:8001
 redis:6380
 
-Setup database:
-Enter the go-utilities/db directory
-`$ cd $GOPATH/src/github.com/artificial-universe-maker/go-utilities/db`
-Run the migrations
-`$ migrate -database "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable" -path migrations up`
+## Database
+1. Enter the go-utilities/db directory
+  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/go-utilities/db`
+2. Run the migrations
+  - `$ migrate -database "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable" -path migrations up`
+
 If you ever need to reset, you can call "migrations down" and then repeat "migrations up" for fresh data
 
-Bonus:
+## Google Actions
 To use Brahman live on Google Actions:
-install ngrok
-`$ ngrok http 9001`
-Update the api.ai project to point to the new ngrok address
-
+1. install ngrok
+  - `$ ngrok http 9001`
+2. Update the api.ai project to point to the new ngrok address
 
 Once it's up and running, then the workbench frontend will work (edited)
 via npm install and npm start
