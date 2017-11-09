@@ -1,7 +1,7 @@
 # Stack
 
-Pesistent Data: Postgres; Redis
-Cache: Redis *(future planned)*
+- Persistent Data: Postgres; Redis
+- Cache: Redis *(future planned)*
 
 ## Postgres
 Postgres is used for storing relational data for web applications such as the workbench.
@@ -26,14 +26,14 @@ Within the context of Brahman (i.e. running AUM applications) Redis is used for 
 The services should now be available on the following ports at localhost (127.0.0.1):
 
 *AUM Services*
-shiva:8000
-lakshmi:8042
-brahman:9001
+- shiva:8000
+- lakshmi:8042
+- brahman:9001
 
 *Additional Services*
-postgres:5432
-adminer:8001
-redis:6380
+- postgres:5432
+- adminer:8001
+- redis:6380
 
 ## Database
 1. Enter the go-utilities/db directory
