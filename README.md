@@ -1,17 +1,53 @@
-# Database
+# Stack
 
-The database is Postgres.
+Pesistent Data: Postgres; Redis
+Cache: Redis *(future planned)*
 
-`$ docker-compose up` from Shiva to run the database and associated servers
-adminer can now be accessed via 127.0.0.1:8001, and postgres via 127.0.0.1:5432
+## Postgres
+Postgres is used for storing relational data for web applications such as the workbench.
 
-In order to conenct to postgres via adminer:
-Host: postgres
-database: postgres
-username: postgres
+## Redis
+Within the context of Brahman (i.e. running AUM applications) Redis is used for storing commands for compiled AUM applications. These commands can mutate the current user's state within the application and persist their state, or mutate the output of the application.
 
-There is no default password
+# Setup
+1. Install Golang
+2. [Ensure go is setup properly](https://golang.org/doc/code.html)
+3. Install Docker
+4. Install docker-compose if not on Mac
+5. Download backend services
+  - `$ go get github.com/artificial-universe-maker/brahman`
+  - `$ go get github.com/artificial-universe-maker/lakshmi`
+  - `$ go get github.com/artificial-universe-maker/shiva`
+6. Enter the go-utilities directory *(this was automatically downloaded from step 3)*
+  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/go-utilities`
+7. Run docker-compose
+  - `$ docker-compose up`
 
-## Migrations
-1. Install https://github.com/mattes/migrate `$ go get github.com/mattes/migrate`
-2. To run: `$ cd ./db && migrate -database "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable" -path migrations up`
+The services should now be available on the following ports at localhost (127.0.0.1):
+
+*AUM Services*
+shiva:8000
+lakshmi:8042
+brahman:9001
+
+*Additional Services*
+postgres:5432
+adminer:8001
+redis:6380
+
+Setup database:
+Enter the go-utilities/db directory
+`$ cd $GOPATH/src/github.com/artificial-universe-maker/go-utilities/db`
+Run the migrations
+`$ migrate -database "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable" -path migrations up`
+If you ever need to reset, you can call "migrations down" and then repeat "migrations up" for fresh data
+
+Bonus:
+To use Brahman live on Google Actions:
+install ngrok
+`$ ngrok http 9001`
+Update the api.ai project to point to the new ngrok address
+
+
+Once it's up and running, then the workbench frontend will work (edited)
+via npm install and npm start
