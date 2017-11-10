@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"log"
 
 	"github.com/artificial-universe-maker/go-ssml"
+	"github.com/artificial-universe-maker/go-utilities/providers"
 )
 
 // AumActionID is an ID for each "action" type
@@ -265,9 +267,32 @@ func (ara *ARASetZone) CreateFrom(bytes []byte) error {
 
 // Execute will mutate the AumMutableRuntimeState in some way
 // Whether it's the state itself or the OutputSSML
-func (ara *ARASetZone) Execute(state *AumMutableRuntimeState) {
-	state.State.Zone = fmt.Sprintf("%v", *ara)
-	state.State.CurrentDialog = nil
+func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
+	message.State.Zone = fmt.Sprintf("%v", *ara)
+	message.State.CurrentDialog = nil
+	redis, err := providers.ConnectRedis()
+	if err != nil {
+		log.Println("Error connecting to redis in models actions ARASetZone Execute", err)
+		return
+	}
+
+	pubID, err := strconv.ParseUint(message.State.PubID, 10, 64)
+	if err != nil {
+		log.Println("Error connecting to redis in models actions ARASetZone Execute", err)
+		return
+	}
+
+	res := redis.HGet(
+		KeynavCompiledTriggersWithinZone(pubID, uint64(*ara)),
+		fmt.Sprintf("%v", AumTriggerInitializeZone))
+
+	if res.Err() == nil {
+		return
+	}
+
+	// TODO: Check for a nil error vs. some other crazy error
+	bytes, err := res.Bytes()
+	ActionBundleEval(message, bytes)
 }
 
 ////////////////////

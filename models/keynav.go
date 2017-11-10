@@ -1,8 +1,9 @@
 // Package keynav is a utility that generates consistent Redis keys
-package keynav
+package models
 
-import "fmt"
-import "github.com/artificial-universe-maker/go-utilities/models"
+import (
+	"fmt"
+)
 
 // compiledNamespaceV1 returns Version 1 of the top level compiled namespace
 func compiledNamespaceV1() string {
@@ -25,82 +26,82 @@ func compiledNamespaceV1() string {
 //
 // Subentities may exist, and would therefore append to all of this in the same pattern,
 // starting with [data_type] etc. etc.
-func CompiledEntity(pubID uint64, entityID models.AEID, uniqueID uint64) string {
+func CompiledEntity(pubID uint64, entityID AEID, uniqueID uint64) string {
 	return fmt.Sprintf("%v:%v:e:%v:%v", compiledNamespaceV1(), pubID, entityID, uniqueID)
 }
 
-// CompiledDialogRootWithinActor generates the key for a dialog root node within a actor
+// KeynavCompiledDialogRootWithinActor generates the key for a dialog root node within a actor
 // Notice that we're not using a node ID. This is because the list of nodes within a actor
 // are not readily available, for performance reasons.
-func CompiledDialogRootWithinActor(pubID, actorID uint64) string {
+func KeynavCompiledDialogRootWithinActor(pubID, actorID uint64) string {
 	return fmt.Sprintf("%v:e:%v:i",
-		CompiledEntity(pubID, models.AEIDActor, actorID),
-		models.AEIDDialogNode)
+		CompiledEntity(pubID, AEIDActor, actorID),
+		AEIDDialogNode)
 }
 
-// CompiledDialogNodeWithinActor generates the key for a dialog node within a actor
-func CompiledDialogNodeWithinActor(pubID, actorID, parentDialogID uint64) string {
+// KeynavCompiledDialogNodeWithinActor generates the key for a dialog node within a actor
+func KeynavCompiledDialogNodeWithinActor(pubID, actorID, parentDialogID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v:i",
-		CompiledEntity(pubID, models.AEIDActor, actorID),
-		models.AEIDDialogNode, parentDialogID)
+		CompiledEntity(pubID, AEIDActor, actorID),
+		AEIDDialogNode, parentDialogID)
 }
 
-func CompiledActorsWithinZone(pubID, zoneID uint64) string {
+func KeynavCompiledActorsWithinZone(pubID, zoneID uint64) string {
 	return fmt.Sprintf("%v:e:%v",
-		CompiledEntity(pubID, models.AEIDZone, zoneID),
-		models.AEIDActor)
+		CompiledEntity(pubID, AEIDZone, zoneID),
+		AEIDActor)
 }
 
-// CompiledDialogNodeActionBundle generates the key for
+// KeynavCompiledDialogNodeActionBundle generates the key for
 // an action bundle within a dialog node
-func CompiledDialogNodeActionBundle(pubID, dialogID, bundleID uint64) string {
+func KeynavCompiledDialogNodeActionBundle(pubID, dialogID, bundleID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v",
-		CompiledEntity(pubID, models.AEIDDialogNode, dialogID),
-		models.AEIDActionBundle, bundleID)
+		CompiledEntity(pubID, AEIDDialogNode, dialogID),
+		AEIDActionBundle, bundleID)
 }
 
-// ProjectMetadataStatic generates the key to access the static metadata hash
+// KeynavProjectMetadataStatic generates the key to access the static metadata hash
 // Static means these values are not updated after published.
-func ProjectMetadataStatic(pubID uint64) string {
+func KeynavProjectMetadataStatic(pubID uint64) string {
 	return fmt.Sprintf("%v:%v:m:s",
 		compiledNamespaceV1(),
 		pubID)
 }
 
-// ProjectMetadataDynamic generates the key to access the dynamic metadata hash
+// KeynavProjectMetadataDynamic generates the key to access the dynamic metadata hash
 // Dynamic means these values may be updated after published.
-func ProjectMetadataDynamic(pubID uint64) string {
+func KeynavProjectMetadataDynamic(pubID uint64) string {
 	return fmt.Sprintf("%v:%v:m:d",
 		compiledNamespaceV1(),
 		pubID)
 }
 
-// GlobalMetaProjects generates the key to access the hash of all published projects
+// KeynavGlobalMetaProjects generates the key to access the hash of all published projects
 // Mapping project name to project ID
-func GlobalMetaProjects() string {
+func KeynavGlobalMetaProjects() string {
 	return fmt.Sprintf("%v:live:projects", compiledNamespaceV1())
 }
 
-// ParseFromKeyBundleID TODO: Consider if this can be helpful for event sourcing
+// KeynavParseFromKeyBundleID TODO: Consider if this can be helpful for event sourcing
 // i.e. capture every action bundle that mutates states
-func ParseFromKeyBundleID(key string) string {
+func KeynavParseFromKeyBundleID(key string) string {
 	fmt.Println(key)
 	return ""
 }
 
-// CompiledTriggerActionBundle generates the key for
+// KeynavCompiledTriggerActionBundle generates the key for
 // an action bundle within a trigger
-func CompiledTriggerActionBundle(pubID, triggerID, bundleID uint64) string {
+func KeynavCompiledTriggerActionBundle(pubID, triggerID, bundleID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v",
-		CompiledEntity(pubID, models.AEIDTrigger, triggerID),
-		models.AEIDActionBundle, bundleID)
+		CompiledEntity(pubID, AEIDTrigger, triggerID),
+		AEIDActionBundle, bundleID)
 }
 
-// CompiledTriggersWithinZone generates a key to a hash of all triggers within the zone
+// KeynavCompiledTriggersWithinZone generates a key to a hash of all triggers within the zone
 // and their keys therein. Each trigger has an associated action bundle with can be accessed
 // via another read operation.
-func CompiledTriggersWithinZone(pubID, zoneID uint64) string {
+func KeynavCompiledTriggersWithinZone(pubID, zoneID uint64) string {
 	return fmt.Sprintf("%v:e:%v",
-		CompiledEntity(pubID, models.AEIDZone, zoneID),
-		models.AEIDTrigger)
+		CompiledEntity(pubID, AEIDZone, zoneID),
+		AEIDTrigger)
 }
