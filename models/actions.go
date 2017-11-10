@@ -85,11 +85,12 @@ type AumMutableRuntimeState struct {
 }
 
 type MutableRuntimeState struct {
-	Zone          string
-	PubID         string
-	CurrentDialog *string
-	ZoneActors    map[string][]string
-	ARVariables   map[string]*ARVariable
+	Zone            string
+	PubID           string
+	CurrentDialog   *string
+	ZoneActors      map[string][]string
+	ZoneInitialized map[string]bool
+	ARVariables     map[string]*ARVariable
 }
 
 type ARVariable struct {
@@ -270,6 +271,13 @@ func (ara *ARASetZone) CreateFrom(bytes []byte) error {
 func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 	message.State.Zone = fmt.Sprintf("%v", *ara)
 	message.State.CurrentDialog = nil
+
+	if message.State.ZoneInitialized[message.State.Zone] {
+		return
+	}
+
+	message.State.ZoneInitialized[message.State.Zone] = true
+
 	redis, err := providers.ConnectRedis()
 	if err != nil {
 		log.Println("Error connecting to redis in models actions ARASetZone Execute", err)

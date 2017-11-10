@@ -10,7 +10,7 @@ func compiledNamespaceV1() string {
 	return "c:v1"
 }
 
-// CompiledEntity generates the key for an entity following the standard pattern
+// KeynavCompiledEntity generates the key for an entity following the standard pattern
 // Because all this data is stored in memory, character count is kept to a bare minimum
 // And many terms are severely truncated
 //
@@ -26,7 +26,7 @@ func compiledNamespaceV1() string {
 //
 // Subentities may exist, and would therefore append to all of this in the same pattern,
 // starting with [data_type] etc. etc.
-func CompiledEntity(pubID uint64, entityID AEID, uniqueID uint64) string {
+func KeynavCompiledEntity(pubID uint64, entityID AEID, uniqueID uint64) string {
 	return fmt.Sprintf("%v:%v:e:%v:%v", compiledNamespaceV1(), pubID, entityID, uniqueID)
 }
 
@@ -35,20 +35,20 @@ func CompiledEntity(pubID uint64, entityID AEID, uniqueID uint64) string {
 // are not readily available, for performance reasons.
 func KeynavCompiledDialogRootWithinActor(pubID, actorID uint64) string {
 	return fmt.Sprintf("%v:e:%v:i",
-		CompiledEntity(pubID, AEIDActor, actorID),
+		KeynavCompiledEntity(pubID, AEIDActor, actorID),
 		AEIDDialogNode)
 }
 
 // KeynavCompiledDialogNodeWithinActor generates the key for a dialog node within a actor
 func KeynavCompiledDialogNodeWithinActor(pubID, actorID, parentDialogID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v:i",
-		CompiledEntity(pubID, AEIDActor, actorID),
+		KeynavCompiledEntity(pubID, AEIDActor, actorID),
 		AEIDDialogNode, parentDialogID)
 }
 
 func KeynavCompiledActorsWithinZone(pubID, zoneID uint64) string {
 	return fmt.Sprintf("%v:e:%v",
-		CompiledEntity(pubID, AEIDZone, zoneID),
+		KeynavCompiledEntity(pubID, AEIDZone, zoneID),
 		AEIDActor)
 }
 
@@ -56,7 +56,7 @@ func KeynavCompiledActorsWithinZone(pubID, zoneID uint64) string {
 // an action bundle within a dialog node
 func KeynavCompiledDialogNodeActionBundle(pubID, dialogID, bundleID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v",
-		CompiledEntity(pubID, AEIDDialogNode, dialogID),
+		KeynavCompiledEntity(pubID, AEIDDialogNode, dialogID),
 		AEIDActionBundle, bundleID)
 }
 
@@ -93,7 +93,7 @@ func KeynavParseFromKeyBundleID(key string) string {
 // an action bundle within a trigger
 func KeynavCompiledTriggerActionBundle(pubID, triggerID, bundleID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v",
-		CompiledEntity(pubID, AEIDTrigger, triggerID),
+		KeynavCompiledEntity(pubID, AEIDTrigger, triggerID),
 		AEIDActionBundle, bundleID)
 }
 
@@ -102,6 +102,6 @@ func KeynavCompiledTriggerActionBundle(pubID, triggerID, bundleID uint64) string
 // via another read operation.
 func KeynavCompiledTriggersWithinZone(pubID, zoneID uint64) string {
 	return fmt.Sprintf("%v:e:%v",
-		CompiledEntity(pubID, AEIDZone, zoneID),
+		KeynavCompiledEntity(pubID, AEIDZone, zoneID),
 		AEIDTrigger)
 }

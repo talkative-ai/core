@@ -55,6 +55,8 @@ ALTER TABLE workbench_projects
 CREATE TABLE IF NOT EXISTS workbench_triggers (
     "ID" BIGSERIAL PRIMARY KEY,
     "ProjectID" BIGINT NOT NULL REFERENCES workbench_projects("ID"),
+    "AlwaysExec" JSONB,
+    "Statements" JSONB,
     "TriggerType" integer NOT NULL,
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
