@@ -3,7 +3,9 @@ package common
 import (
 	"database/sql/driver"
 	"log"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/go-redis/redis"
 )
@@ -83,4 +85,17 @@ func (arr *StringArray) Scan(src interface{}) error {
 		}
 	}
 	return nil
+}
+
+func PseudoRand(max int) int {
+	rand.Seed(time.Now().UTC().UnixNano())
+	return rand.Intn(max)
+}
+
+func Choose(list interface{}) interface{} {
+	l := list.([]interface{})
+	if len(l) == 1 {
+		return l[0]
+	}
+	return l[PseudoRand(len(l))]
 }
