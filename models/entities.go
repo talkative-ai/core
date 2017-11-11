@@ -178,18 +178,12 @@ type AumZone struct {
 	ProjectID   uint64 `json:"-"`
 	Title       string
 	Description string
-	LinkedZones []AumZoneLink `json:"LinkedZones,omitempty"`
+	Triggers    map[AumTriggerType]AumTrigger `db:"-"`
 }
 
 type AumZoneActor struct {
 	ZoneID      interface{}
 	ActorID     interface{}
-	PatchAction *PatchAction `json:",omitempty" db:"-"`
-}
-
-type AumZoneTrigger struct {
-	ZoneID      interface{}
-	TriggerID   interface{}
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
 
@@ -215,6 +209,7 @@ type AumTrigger struct {
 	AumModel
 	TriggerType AumTriggerType
 	RawLBlock
+	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
 
 // AumNote model for the Note entities
