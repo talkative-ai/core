@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	utilities "github.com/artificial-universe-maker/go-utilities"
+	utilities "github.com/artificial-universe-maker/core"
 
 	"encoding/binary"
 )

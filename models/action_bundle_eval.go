@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	utilities "github.com/artificial-universe-maker/go-utilities"
+	utilities "github.com/artificial-universe-maker/core"
 )
 
 func ActionBundleEval(state *AumMutableRuntimeState, bundle []byte) error {

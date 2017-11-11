@@ -8,8 +8,8 @@ import (
 
 	"time"
 
-	"github.com/artificial-universe-maker/go-utilities"
-	"github.com/artificial-universe-maker/go-utilities/myerrors"
+	"github.com/artificial-universe-maker/core"
+	"github.com/artificial-universe-maker/core/myerrors"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 

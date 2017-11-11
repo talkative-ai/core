@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/artificial-universe-maker/go-utilities/common"
+	"github.com/artificial-universe-maker/core/common"
 	"github.com/go-gorp/gorp"
 )
 

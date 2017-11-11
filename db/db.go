@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/artificial-universe-maker/go-utilities/models"
+	"github.com/artificial-universe-maker/core/models"
 	"github.com/go-gorp/gorp"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Required for sqlx postgres connections

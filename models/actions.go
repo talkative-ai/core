@@ -13,7 +13,7 @@ import (
 	"log"
 
 	"github.com/artificial-universe-maker/go-ssml"
-	"github.com/artificial-universe-maker/go-utilities/providers"
+	"github.com/artificial-universe-maker/core/providers"
 )
 
 // AumActionID is an ID for each "action" type

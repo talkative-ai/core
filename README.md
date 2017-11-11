@@ -18,8 +18,8 @@ Within the context of Brahman (i.e. running AUM applications) Redis is used for 
   - `$ go get github.com/artificial-universe-maker/brahman`
   - `$ go get github.com/artificial-universe-maker/lakshmi`
   - `$ go get github.com/artificial-universe-maker/shiva`
-6. Enter the go-utilities directory *(this was automatically downloaded from step 3)*
-  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/go-utilities`
+6. Enter the core directory *(this was automatically downloaded from step 3)*
+  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/core`
 7. Run docker-compose
   - `$ docker-compose up`
 
@@ -36,8 +36,8 @@ The services should now be available on the following ports at localhost (127.0.
 - redis:6380
 
 ## Database
-1. Enter the go-utilities/db directory
-  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/go-utilities/db`
+1. Enter the core/db directory
+  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/core/db`
 2. Run the migrations
   - `$ migrate -database "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable" -path migrations up`
 

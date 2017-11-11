@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/artificial-universe-maker/go-utilities/prehandle"
+	"github.com/artificial-universe-maker/core/prehandle"
 	"github.com/gorilla/mux"
 )
 
