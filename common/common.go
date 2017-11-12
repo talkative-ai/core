@@ -92,8 +92,8 @@ func PseudoRand(max int) int {
 	return rand.Intn(max)
 }
 
-func Choose(list interface{}) interface{} {
-	l := list.([]interface{})
+func ChooseString(list interface{}) interface{} {
+	l := list.([]string)
 	if len(l) == 1 {
 		return l[0]
 	}

@@ -12,8 +12,8 @@ import (
 
 	"log"
 
-	"github.com/artificial-universe-maker/go-ssml"
 	"github.com/artificial-universe-maker/core/providers"
+	"github.com/artificial-universe-maker/go-ssml"
 )
 
 // AumActionID is an ID for each "action" type
@@ -222,7 +222,7 @@ func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 		r, err := regexp.Compile(`{{\w+}}`)
 		v := ara.Val.(string)
 		if err != nil {
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 		newv := r.ReplaceAllFunc([]byte(v), func(b []byte) []byte {
@@ -280,27 +280,44 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 
 	redis, err := providers.ConnectRedis()
 	if err != nil {
-		log.Println("Error connecting to redis in models actions ARASetZone Execute", err)
+		log.Fatal("Error connecting to redis in models actions ARASetZone Execute", err)
 		return
 	}
 
 	pubID, err := strconv.ParseUint(message.State.PubID, 10, 64)
 	if err != nil {
-		log.Println("Error connecting to redis in models actions ARASetZone Execute", err)
+		log.Fatal("Error connecting to redis in models actions ARASetZone Execute", err)
 		return
 	}
 
 	res := redis.HGet(
 		KeynavCompiledTriggersWithinZone(pubID, uint64(*ara)),
-		fmt.Sprintf("%v", AumTriggerInitializeZone))
+		fmt.Sprintf("%v", AumTriggerInitializeZone)).Val()
 
-	if res.Err() == nil {
-		return
+	stateComms := make(chan AumMutableRuntimeState)
+	result := LogicLazyEval(stateComms, []byte(res))
+	for res := range result {
+		if res.Error != nil {
+			log.Fatal("Error in SetZone with logic evaluation", res.Error)
+			return
+		}
+		bundleBinary, err := redis.Get(res.Value).Bytes()
+		if err != nil {
+			log.Fatal("Error in SetZone fetching action bundle binary", err)
+			return
+		}
+		err = ActionBundleEval(message, bundleBinary)
+		if err != nil {
+			log.Fatal("Error in SetZone processing action bundle binary", err)
+			return
+		}
 	}
-
-	// TODO: Check for a nil error vs. some other crazy error
-	bytes, err := res.Bytes()
-	ActionBundleEval(message, bytes)
+	// stateChange = true
+	// if stateChange {
+	// 	newID := <-eventIDChan
+	// 	stateObject, _ := message.State.Value()
+	// 	go db.Instance.QueryRow(`INSERT INTO event_state_change ("EventUserActionID", "StateObject") VALUES ($1, $2)`, newID, stateObject)
+	// }
 }
 
 ////////////////////
@@ -385,7 +402,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		if ara.With.ARVariable.T != state.State.ARVariables[ara.Target].T {
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 		newval = n
@@ -398,7 +415,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVOSubtract:
@@ -408,7 +425,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVODivide:
@@ -418,7 +435,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVOModulo:
@@ -428,7 +445,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVONot:
@@ -438,7 +455,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVOInsert:
@@ -452,7 +469,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVODelete:
@@ -464,7 +481,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	case SVOReplace:
@@ -476,7 +493,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Println("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
 			return
 		}
 	}
