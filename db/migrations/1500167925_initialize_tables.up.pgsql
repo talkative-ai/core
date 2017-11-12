@@ -53,11 +53,11 @@ ALTER TABLE workbench_projects
     REFERENCES workbench_zones("ID");
 
 CREATE TABLE IF NOT EXISTS workbench_triggers (
-    "ID" BIGSERIAL PRIMARY KEY,
+    "TriggerType" integer PRIMARY KEY,
     "ProjectID" BIGINT NOT NULL REFERENCES workbench_projects("ID"),
+    "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
     "AlwaysExec" JSONB,
     "Statements" JSONB,
-    "TriggerType" integer NOT NULL,
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
 CREATE TABLE IF NOT EXISTS workbench_notes (
@@ -85,11 +85,6 @@ CREATE TABLE IF NOT EXISTS workbench_dialog_nodes_relations (
 CREATE TABLE IF NOT EXISTS workbench_zones_actors (
     "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
     "ActorID" BIGINT NOT NULL REFERENCES workbench_actors("ID")
-);
-
-CREATE TABLE IF NOT EXISTS workbench_zones_triggers (
-    "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
-    "TriggerID" BIGINT NOT NULL REFERENCES workbench_triggers("ID")
 );
 
 -- Gameplay event sourcing tables

@@ -14,9 +14,10 @@ import (
 
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
-	ID        uint64        `db:"ID, primarykey, autoincrement"`
-	CreateID  *string       `db:"-" json:",omitempty"`
-	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
+	ID          uint64        `db:"ID, primarykey, autoincrement"`
+	CreateID    *string       `db:"-" json:",omitempty"`
+	CreatedAt   gorp.NullTime `json:"CreatedAt,omitempty"`
+	PatchAction *PatchAction  `json:",omitempty" db:"-"`
 }
 
 func (m *AumModel) PreInsert(s gorp.SqlExecutor) error {
@@ -206,8 +207,8 @@ const (
 
 // AumTrigger model for Trigger entities
 type AumTrigger struct {
-	AumModel
 	TriggerType AumTriggerType
+	ZoneID      interface{}
 	RawLBlock
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
