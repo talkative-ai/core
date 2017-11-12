@@ -92,7 +92,7 @@ func KeynavParseFromKeyBundleID(key string) string {
 // KeynavCompiledTriggerActionBundle generates the key for
 // an action bundle within a trigger
 func KeynavCompiledTriggerActionBundle(pubID, zoneID, triggerType, bundleID uint64) string {
-	return fmt.Sprintf("%v:e:%v:%v:%v:%v",
+	return fmt.Sprintf("%v:e:%v:%v:e%v:%v",
 		KeynavCompiledEntity(pubID, AEIDZone, zoneID),
 		AEIDTrigger, triggerType,
 		AEIDActionBundle, bundleID)
