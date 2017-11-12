@@ -294,6 +294,11 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 		KeynavCompiledTriggersWithinZone(pubID, uint64(*ara)),
 		fmt.Sprintf("%v", AumTriggerInitializeZone)).Val()
 
+	// There is no initialize trigger
+	if res == "" {
+		return
+	}
+
 	stateComms := make(chan AumMutableRuntimeState)
 	result := LogicLazyEval(stateComms, []byte(res))
 	for res := range result {
