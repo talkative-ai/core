@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -98,4 +99,9 @@ func ChooseString(list []string) string {
 		return l[0]
 	}
 	return l[PseudoRand(len(l))]
+}
+
+type SyncMapUint64 struct {
+	Value map[uint64]bool
+	Mutex sync.Mutex
 }
