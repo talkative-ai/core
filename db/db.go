@@ -35,10 +35,12 @@ func InitializeDB() error {
 	DBMap.AddTableWithName(models.AumZoneActor{}, "workbench_zones_actors")
 	DBMap.AddTableWithName(models.AumDialogNode{}, "workbench_dialog_nodes")
 	DBMap.AddTableWithName(models.AumDialogRelation{}, "workbench_dialog_nodes_relations")
+	DBMap.AddTableWithName(models.AumPrivateProjectGrants{}, "workbench_private_project_grants")
 	DBMap.AddTableWithName(models.AumNote{}, "workbench_notes")
 
 	DBMap.AddTableWithName(models.User{}, "users")
 	DBMap.AddTableWithName(models.Team{}, "teams")
+	DBMap.AddTableWithName(models.UpgradeItem{}, "upgrade_item")
 	DBMap.AddTableWithName(models.TeamMember{}, "team_members")
 
 	DBMap.AddTableWithName(models.EventUserActon{}, "event_user_action")

@@ -33,11 +33,13 @@ type AumProject struct {
 	Title       string
 	TeamID      uint64
 	StartZoneID sql.NullInt64 // Expected Zone ID
+	IsPrivate   bool
 
-	Actors     []AumActor     `db:"-"`
-	Zones      []AumZone      `db:"-"`
-	ZoneActors []AumZoneActor `db:"-"`
-	Notes      []AumNote      `db:"-"`
+	Actors               []AumActor                `db:"-"`
+	Zones                []AumZone                 `db:"-"`
+	ZoneActors           []AumZoneActor            `db:"-"`
+	PrivateProjectGrants []AumPrivateProjectGrants `db:"-"`
+	Notes                []AumNote                 `db:"-"`
 }
 
 func (p AumProject) PrepareMarshal() map[string]interface{} {
@@ -55,6 +57,12 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 	}
 
 	return result
+}
+
+type AumPrivateProjectGrants struct {
+	ID        uint64 `db:"ID, primarykey, autoincrement"`
+	ProjectID uint64
+	UserID    uint64
 }
 
 // AEID is an AumEntityID

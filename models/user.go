@@ -19,6 +19,18 @@ type User struct {
 	Salt        sql.NullString `json:"-"`
 }
 
+type UpgradeItemSKU int
+
+const (
+	UpgradeItemSKUBusiness UpgradeItemSKU = iota
+)
+
+type UpgradeItem struct {
+	UserID uint64
+	SKU    UpgradeItemSKU
+	Trial  gorp.NullTime
+}
+
 // Team model relates multiple users under the same umbrella
 // If the Name is null, then it's the user by themselves
 type Team struct {

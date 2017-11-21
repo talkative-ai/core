@@ -10,6 +10,13 @@ CREATE TABLE IF NOT EXISTS users (
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
 
+CREATE TABLE IF NOT EXISTS upgrade_item (
+    "ID" BIGSERIAL PRIMARY KEY,
+    "UserID" BIGINT NOT NULL REFERENCES users("ID"),
+    "SKU" INTEGER NOT NULL,
+    "Trial" timestamp
+);
+
 -- User Teams
 CREATE TABLE IF NOT EXISTS teams (
     "ID" BIGSERIAL PRIMARY KEY,
@@ -30,7 +37,14 @@ CREATE TABLE IF NOT EXISTS workbench_projects (
     "TeamID" BIGINT NOT NULL REFERENCES teams("ID"),
     "Title" TEXT,
     "StartZoneID" BIGINT,
-    "CreatedAt" timestamp DEFAULT current_timestamp
+    "CreatedAt" timestamp DEFAULT current_timestamp,
+    "IsPrivate" BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS workbench_private_project_grants (
+    "ID" BIGSERIAL PRIMARY KEY,
+    "ProjectID" BIGINT NOT NULL REFERENCES workbench_projects("ID"),
+    "UserID" BIGINT NOT NULL REFERENCES users("ID")
 );
 
 -- Basic entities
@@ -53,7 +67,8 @@ ALTER TABLE workbench_projects
     REFERENCES workbench_zones("ID");
 
 CREATE TABLE IF NOT EXISTS workbench_triggers (
-    "TriggerType" integer PRIMARY KEY,
+    "ID" BIGSERIAL PRIMARY KEY,
+    "TriggerType" INTEGER,
     "ProjectID" BIGINT NOT NULL REFERENCES workbench_projects("ID"),
     "ZoneID" BIGINT NOT NULL REFERENCES workbench_zones("ID"),
     "AlwaysExec" JSONB,
@@ -91,7 +106,7 @@ CREATE TABLE IF NOT EXISTS workbench_zones_actors (
 CREATE TABLE IF NOT EXISTS event_user_action (
     "ID" BIGSERIAL PRIMARY KEY,
     "UserID" BIGINT NOT NULL REFERENCES users("ID"),
-    "PubID" integer, -- Publishing ID; a unique ID that the project will have when published
+    "PubID" INTEGER, -- Publishing ID; a unique ID that the project will have when published
     "RawInput" TEXT,
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
