@@ -162,6 +162,7 @@ type PatchAction uint8
 const (
 	PatchActionCreate PatchAction = iota
 	PatchActionDelete
+	PatchActionUpdate
 )
 
 // AumActor model for the Actor entities
