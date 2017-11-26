@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS workbench_projects (
     "Title" TEXT,
     "StartZoneID" BIGINT,
     "CreatedAt" timestamp DEFAULT current_timestamp,
-    "IsPrivate" BOOLEAN
+    "IsPrivate" BOOLEAN DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS workbench_private_project_grants (
