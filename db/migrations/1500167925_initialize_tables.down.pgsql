@@ -8,7 +8,6 @@ DROP TABLE IF EXISTS workbench_zones_actors CASCADE;
 DROP TABLE IF EXISTS workbench_actors CASCADE;
 DROP TABLE IF EXISTS workbench_zones CASCADE;
 DROP TABLE IF EXISTS workbench_triggers CASCADE;
-DROP TABLE IF EXISTS workbench_notes CASCADE;
 DROP TABLE IF EXISTS workbench_dialog_nodes_relations CASCADE;
 DROP TABLE IF EXISTS workbench_dialog_nodes CASCADE;
 DROP TABLE IF EXISTS event_user_action CASCADE;

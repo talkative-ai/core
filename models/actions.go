@@ -2,13 +2,13 @@ package models
 
 import (
 	"database/sql/driver"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
-	"strconv"
 	"strings"
+
+	"github.com/artificial-universe-maker/go.uuid"
 
 	"log"
 
@@ -39,7 +39,7 @@ const (
 type AumActionSet struct {
 	SetGlobalVariables    []ARASetVariable
 	PlaySounds            []ARAPlaySound
-	InitializeActorDialog int32
+	InitializeActorDialog uuid.UUID
 	SetZone               ARASetZone
 	ResetGame             bool
 }
@@ -69,7 +69,7 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 			ch <- &action
 		}
 
-		if uint64(AAS.SetZone) != 0 {
+		if uuid.UUID(AAS.SetZone) != uuid.Nil {
 			ch <- &AAS.SetZone
 		}
 	}()
@@ -159,7 +159,7 @@ func GetActionFromID(id AumActionID) AumRuntimeAction {
 	case AAIDPlaySound:
 		return &ARAPlaySound{}
 	case AAIDSetZone:
-		n := ARASetZone(0)
+		n := ARASetZone(uuid.Nil)
 		return &n
 	case AAIDSetARVariable:
 		return &ARASetVariable{}
@@ -242,7 +242,7 @@ func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 ////////////////
 // ARASetZone //
 ////////////////
-type ARASetZone uint64
+type ARASetZone uuid.UUID
 
 // GetAAID returns the AumActionID of the current RuntimeAction
 func (ara *ARASetZone) GetAAID() AumActionID {
@@ -253,23 +253,28 @@ func (ara *ARASetZone) GetAAID() AumActionID {
 // Returns the compiled []byte slice of the runtime action
 // To be stored in Redis
 func (ara ARASetZone) Compile() []byte {
-	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, uint64(ara))
-	return b
+	return uuid.UUID(ara).Bytes()
 }
 
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
 // This could be put in a single "Execute" but this is less monolothic
 func (ara *ARASetZone) CreateFrom(bytes []byte) error {
-	n := ARASetZone(binary.LittleEndian.Uint64(bytes))
-	*ara = n
+	*ara = ARASetZone(uuid.FromBytesOrNil(bytes))
 	return nil
+}
+
+func (ara *ARASetZone) String() string {
+	return uuid.UUID(*ara).String()
+}
+
+func (ara *ARASetZone) UUID() uuid.UUID {
+	return uuid.UUID(*ara)
 }
 
 // Execute will mutate the AumMutableRuntimeState in some way
 // Whether it's the state itself or the OutputSSML
 func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
-	message.State.Zone = fmt.Sprintf("%v", *ara)
+	message.State.Zone = ara.String()
 	message.State.CurrentDialog = nil
 
 	if message.State.ZoneInitialized[message.State.Zone] {
@@ -284,14 +289,8 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 		return
 	}
 
-	pubID, err := strconv.ParseUint(message.State.PubID, 10, 64)
-	if err != nil {
-		log.Fatal("Error connecting to redis in models actions ARASetZone Execute", err)
-		return
-	}
-
 	res := redis.HGet(
-		KeynavCompiledTriggersWithinZone(pubID, uint64(*ara)),
+		KeynavCompiledTriggersWithinZone(message.State.PubID, ara.String()),
 		fmt.Sprintf("%v", AumTriggerInitializeZone)).Val()
 
 	// There is no initialize trigger

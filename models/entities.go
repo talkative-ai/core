@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/artificial-universe-maker/core/common"
+	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-gorp/gorp"
 )
 
 // AumModel is an embedded struct of common model fields
 type AumModel struct {
-	ID          uint64        `db:"ID, primarykey, autoincrement"`
+	ID          uuid.UUID     `db:"ID, primarykey, autoincrement"`
 	CreateID    *string       `db:"-" json:",omitempty"`
 	CreatedAt   gorp.NullTime `json:"CreatedAt,omitempty"`
 	PatchAction *PatchAction  `json:",omitempty" db:"-"`
@@ -31,8 +32,8 @@ type AumProject struct {
 	AumModel
 
 	Title       string
-	TeamID      uint64
-	StartZoneID sql.NullInt64 // Expected Zone ID
+	TeamID      uuid.UUID
+	StartZoneID sql.NullString // Expected Zone ID
 	IsPrivate   bool
 
 	Actors               []AumActor                `db:"-"`
@@ -40,6 +41,12 @@ type AumProject struct {
 	ZoneActors           []AumZoneActor            `db:"-"`
 	PrivateProjectGrants []AumPrivateProjectGrants `db:"-"`
 	Notes                []AumNote                 `db:"-"`
+}
+
+type AumPublishedProject struct {
+	ProjectID uuid.UUID
+	TeamID    uuid.UUID
+	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
 }
 
 func (p AumProject) PrepareMarshal() map[string]interface{} {
@@ -53,16 +60,16 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 	}
 
 	if p.StartZoneID.Valid {
-		result["StartZoneID"] = p.StartZoneID.Int64
+		result["StartZoneID"] = p.StartZoneID.String
 	}
 
 	return result
 }
 
 type AumPrivateProjectGrants struct {
-	ID        uint64 `db:"ID, primarykey, autoincrement"`
-	ProjectID uint64
-	UserID    uint64
+	ID        uuid.UUID `db:"ID, primarykey, autoincrement"`
+	ProjectID uuid.UUID
+	UserID    uuid.UUID
 }
 
 // AEID is an AumEntityID
@@ -91,8 +98,8 @@ type AumDialogNode struct {
 	AumModel
 
 	IsRoot     *bool
-	ProjectID  uint64 `json:"-"`
-	ActorID    uint64 `json:"-"`
+	ProjectID  uuid.UUID `json:"-"`
+	ActorID    uuid.UUID `json:"-"`
 	EntryInput AumDialogInputArray
 	RawLBlock
 	ChildNodes  *[]*AumDialogNode `db:"-" json:"-"`
@@ -165,19 +172,40 @@ const (
 	PatchActionUpdate
 )
 
+type UUIDCreateID struct {
+	uuid.UUID
+	CreateID *string
+}
+
+func (u *UUIDCreateID) UnmarshalText(text []byte) error {
+	if strings.HasPrefix(string(text), "create") {
+		str := string(text)
+		u.CreateID = &str
+		return nil
+	}
+	tmp := uuid.UUID{}
+	err := tmp.UnmarshalText(text)
+	if err != nil {
+		return err
+	}
+
+	(*u).UUID = tmp
+	return nil
+}
+
 // AumActor model for the Actor entities
 type AumActor struct {
 	AumModel
 
 	Title           string
-	ProjectID       uint64              `json:"-"`
+	ProjectID       uuid.UUID           `json:"-"`
 	Dialogs         []AumDialogNode     `json:",omitempty" db:"-"`
 	DialogRelations []AumDialogRelation `json:",omitempty" db:"-"`
 }
 
 type AumDialogRelation struct {
-	ParentNodeID interface{}
-	ChildNodeID  interface{}
+	ParentNodeID UUIDCreateID
+	ChildNodeID  UUIDCreateID
 	PatchAction  *PatchAction `json:",omitempty" db:"-"`
 }
 
@@ -185,24 +213,16 @@ type AumDialogRelation struct {
 type AumZone struct {
 	AumModel
 
-	ProjectID   uint64 `json:"-"`
+	ProjectID   uuid.UUID `json:"-"`
 	Title       string
 	Description string
 	Triggers    map[AumTriggerType]AumTrigger `db:"-"`
 }
 
 type AumZoneActor struct {
-	ZoneID      interface{}
-	ActorID     interface{}
+	ZoneID      UUIDCreateID
+	ActorID     UUIDCreateID
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
-}
-
-// AumZoneLink explicitly linked zones
-type AumZoneLink struct {
-	AumModel
-
-	ZoneFrom uint64
-	ZoneTo   uint64
 }
 
 type AumTriggerType int
@@ -217,7 +237,7 @@ const (
 // AumTrigger model for Trigger entities
 type AumTrigger struct {
 	TriggerType AumTriggerType
-	ZoneID      interface{}
+	ZoneID      UUIDCreateID
 	RawLBlock
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }

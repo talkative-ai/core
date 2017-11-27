@@ -26,27 +26,27 @@ func compiledNamespaceV1() string {
 //
 // Subentities may exist, and would therefore append to all of this in the same pattern,
 // starting with [data_type] etc. etc.
-func KeynavCompiledEntity(pubID uint64, entityID AEID, uniqueID uint64) string {
+func KeynavCompiledEntity(pubID string, entityID AEID, uniqueID string) string {
 	return fmt.Sprintf("%v:%v:e:%v:%v", compiledNamespaceV1(), pubID, entityID, uniqueID)
 }
 
 // KeynavCompiledDialogRootWithinActor generates the key for a dialog root node within a actor
 // Notice that we're not using a node ID. This is because the list of nodes within a actor
 // are not readily available, for performance reasons.
-func KeynavCompiledDialogRootWithinActor(pubID, actorID uint64) string {
+func KeynavCompiledDialogRootWithinActor(pubID, actorID string) string {
 	return fmt.Sprintf("%v:e:%v:i",
 		KeynavCompiledEntity(pubID, AEIDActor, actorID),
 		AEIDDialogNode)
 }
 
 // KeynavCompiledDialogNodeWithinActor generates the key for a dialog node within a actor
-func KeynavCompiledDialogNodeWithinActor(pubID, actorID, parentDialogID uint64) string {
+func KeynavCompiledDialogNodeWithinActor(pubID, actorID, parentDialogID string) string {
 	return fmt.Sprintf("%v:e:%v:%v:i",
 		KeynavCompiledEntity(pubID, AEIDActor, actorID),
 		AEIDDialogNode, parentDialogID)
 }
 
-func KeynavCompiledActorsWithinZone(pubID, zoneID uint64) string {
+func KeynavCompiledActorsWithinZone(pubID, zoneID string) string {
 	return fmt.Sprintf("%v:e:%v",
 		KeynavCompiledEntity(pubID, AEIDZone, zoneID),
 		AEIDActor)
@@ -54,7 +54,7 @@ func KeynavCompiledActorsWithinZone(pubID, zoneID uint64) string {
 
 // KeynavCompiledDialogNodeActionBundle generates the key for
 // an action bundle within a dialog node
-func KeynavCompiledDialogNodeActionBundle(pubID, dialogID, bundleID uint64) string {
+func KeynavCompiledDialogNodeActionBundle(pubID, dialogID string, bundleID uint64) string {
 	return fmt.Sprintf("%v:e:%v:%v",
 		KeynavCompiledEntity(pubID, AEIDDialogNode, dialogID),
 		AEIDActionBundle, bundleID)
@@ -62,7 +62,7 @@ func KeynavCompiledDialogNodeActionBundle(pubID, dialogID, bundleID uint64) stri
 
 // KeynavProjectMetadataStatic generates the key to access the static metadata hash
 // Static means these values are not updated after published.
-func KeynavProjectMetadataStatic(pubID uint64) string {
+func KeynavProjectMetadataStatic(pubID string) string {
 	return fmt.Sprintf("%v:%v:m:s",
 		compiledNamespaceV1(),
 		pubID)
@@ -70,7 +70,7 @@ func KeynavProjectMetadataStatic(pubID uint64) string {
 
 // KeynavProjectMetadataDynamic generates the key to access the dynamic metadata hash
 // Dynamic means these values may be updated after published.
-func KeynavProjectMetadataDynamic(pubID uint64) string {
+func KeynavProjectMetadataDynamic(pubID string) string {
 	return fmt.Sprintf("%v:%v:m:d",
 		compiledNamespaceV1(),
 		pubID)
@@ -91,7 +91,7 @@ func KeynavParseFromKeyBundleID(key string) string {
 
 // KeynavCompiledTriggerActionBundle generates the key for
 // an action bundle within a trigger
-func KeynavCompiledTriggerActionBundle(pubID, zoneID, triggerType, bundleID uint64) string {
+func KeynavCompiledTriggerActionBundle(pubID, zoneID, triggerType, bundleID string) string {
 	return fmt.Sprintf("%v:e:%v:%v:e:%v:%v",
 		KeynavCompiledEntity(pubID, AEIDZone, zoneID),
 		AEIDTrigger, triggerType,
@@ -101,7 +101,7 @@ func KeynavCompiledTriggerActionBundle(pubID, zoneID, triggerType, bundleID uint
 // KeynavCompiledTriggersWithinZone generates a key to a hash of all triggers within the zone
 // and their keys therein. Each trigger has an associated action bundle with can be accessed
 // via another read operation.
-func KeynavCompiledTriggersWithinZone(pubID, zoneID uint64) string {
+func KeynavCompiledTriggersWithinZone(pubID, zoneID string) string {
 	return fmt.Sprintf("%v:e:%v",
 		KeynavCompiledEntity(pubID, AEIDZone, zoneID),
 		AEIDTrigger)

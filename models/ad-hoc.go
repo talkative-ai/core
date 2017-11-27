@@ -4,27 +4,27 @@ import (
 	"database/sql"
 
 	"github.com/artificial-universe-maker/core/common"
+	uuid "github.com/artificial-universe-maker/go.uuid"
 )
 
 type ProjectItem struct {
-	ProjectID            uint64
+	ProjectID            uuid.UUID
 	Title                string
-	ZoneID               uint64
-	ActorID              uint64
-	DialogID             uint64
+	ZoneID               uuid.UUID
+	ActorID              uuid.UUID
+	DialogID             uuid.UUID
 	DialogEntry          common.StringArray
-	ParentDialogID       sql.NullInt64
-	ChildDialogID        sql.NullInt64
+	ParentDialogID       sql.NullString
+	ChildDialogID        sql.NullString
 	IsRoot               bool
 	LogicalSetAlways     string
 	LogicalSetStatements sql.NullString
-	LogicalSetID         uint64
 	RawLBlock
 }
 
 type ProjectTriggerItem struct {
-	ProjectID   uint64
-	ZoneID      uint64
+	ProjectID   uuid.UUID
+	ZoneID      uuid.UUID
 	TriggerType AumTriggerType
 	RawLBlock
 }

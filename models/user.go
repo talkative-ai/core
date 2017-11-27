@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-gorp/gorp"
 )
 
@@ -26,7 +27,7 @@ const (
 )
 
 type UpgradeItem struct {
-	UserID uint64
+	UserID uuid.UUID
 	SKU    UpgradeItemSKU
 	Trial  gorp.NullTime
 }
@@ -41,8 +42,8 @@ type Team struct {
 // TeamMember is the relationship bretween a user and a team
 // and includes the user's role within the team
 type TeamMember struct {
-	UserID    uint64
-	TeamID    uint64
+	UserID    uuid.UUID
+	TeamID    uuid.UUID
 	Role      int
 	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
 }

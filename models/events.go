@@ -3,18 +3,19 @@ package models
 import (
 	"time"
 
+	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-gorp/gorp"
 )
 
 type EventUserActon struct {
 	AumModel
-	UserID   uint64
-	PubID    uint64
+	UserID   uuid.UUID
+	PubID    uuid.UUID
 	RawInput string
 }
 
 type EventStateChange struct {
-	EventUserActionID uint64
+	EventUserActionID string
 	StateObject       MutableRuntimeState
 	CreatedAt         gorp.NullTime `json:"CreatedAt,omitempty"`
 }
