@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS workbench_zones_actors (
 CREATE TABLE IF NOT EXISTS event_user_action (
     "ID" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "UserID" UUID NOT NULL REFERENCES users("ID"),
-    "PubID" INTEGER, -- Publishing ID; a unique ID that the project will have when published
+    "PubID" UUID NOT NULL REFERENCES workbench_projects("ID"), -- Publishing ID; a unique ID that the project will have when published
     "RawInput" TEXT,
     "CreatedAt" timestamp DEFAULT current_timestamp
 );
