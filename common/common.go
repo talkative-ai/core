@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-redis/redis"
 )
 
@@ -101,7 +102,7 @@ func ChooseString(list []string) string {
 	return l[PseudoRand(len(l))]
 }
 
-type SyncMapUint64 struct {
-	Value map[uint64]bool
+type SyncMapUUID struct {
+	Value map[uuid.UUID]bool
 	Mutex sync.Mutex
 }

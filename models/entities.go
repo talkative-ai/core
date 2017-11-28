@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
@@ -33,7 +32,7 @@ type AumProject struct {
 
 	Title       string
 	TeamID      uuid.UUID
-	StartZoneID sql.NullString // Expected Zone ID
+	StartZoneID uuid.NullUUID // Expected Zone ID
 	IsPrivate   bool
 
 	Actors               []AumActor                `db:"-"`
@@ -60,7 +59,7 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 	}
 
 	if p.StartZoneID.Valid {
-		result["StartZoneID"] = p.StartZoneID.String
+		result["StartZoneID"] = p.StartZoneID.UUID.String()
 	}
 
 	return result

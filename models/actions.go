@@ -85,11 +85,11 @@ type AumMutableRuntimeState struct {
 }
 
 type MutableRuntimeState struct {
-	Zone            string
-	PubID           string
+	Zone            uuid.UUID
+	PubID           uuid.UUID
 	CurrentDialog   *string
-	ZoneActors      map[string][]string
-	ZoneInitialized map[string]bool
+	ZoneActors      map[uuid.UUID][]string
+	ZoneInitialized map[uuid.UUID]bool
 	ARVariables     map[string]*ARVariable
 }
 
@@ -274,7 +274,7 @@ func (ara *ARASetZone) UUID() uuid.UUID {
 // Execute will mutate the AumMutableRuntimeState in some way
 // Whether it's the state itself or the OutputSSML
 func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
-	message.State.Zone = ara.String()
+	message.State.Zone = ara.UUID()
 	message.State.CurrentDialog = nil
 
 	if message.State.ZoneInitialized[message.State.Zone] {
@@ -290,7 +290,7 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 	}
 
 	res := redis.HGet(
-		KeynavCompiledTriggersWithinZone(message.State.PubID, ara.String()),
+		KeynavCompiledTriggersWithinZone(message.State.PubID.String(), ara.String()),
 		fmt.Sprintf("%v", AumTriggerInitializeZone)).Val()
 
 	// There is no initialize trigger
