@@ -32,7 +32,7 @@ type AumProject struct {
 
 	Title       string
 	TeamID      uuid.UUID
-	StartZoneID uuid.NullUUID // Expected Zone ID
+	StartZoneID uuid.UUID // Expected Zone ID
 	IsPrivate   bool
 
 	Actors               []AumActor                `db:"-"`
@@ -58,8 +58,8 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 		"ZoneActors": p.ZoneActors,
 	}
 
-	if p.StartZoneID.Valid {
-		result["StartZoneID"] = p.StartZoneID.UUID.String()
+	if p.StartZoneID != uuid.Nil {
+		result["StartZoneID"] = p.StartZoneID.String()
 	}
 
 	return result
