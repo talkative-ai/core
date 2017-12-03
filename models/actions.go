@@ -30,8 +30,8 @@ const (
 	AAIDInitializeActorDialog
 	// AAIDSetZone AumActionID for SetZone
 	AAIDSetZone
-	// AAIDResetGame AumActionID for ResetGame
-	AAIDResetGame
+	// AAIDResetApp AumActionID for ResetApp
+	AAIDResetApp
 )
 
 // AumActionSet is a pre-bundled set of actions
@@ -41,7 +41,7 @@ type AumActionSet struct {
 	PlaySounds            []ARAPlaySound
 	InitializeActorDialog uuid.UUID
 	SetZone               ARASetZone
-	ResetGame             bool
+	ResetApp              bool
 }
 
 func (a *AumActionSet) Scan(src interface{}) error {
