@@ -36,6 +36,9 @@ The services should now be available on the following ports at localhost (127.0.
 - redis:6380
 
 ## Database
+0. Ensure you have the migration tool installed
+  1. # go get -u -d github.com/mattes/migrate/cli github.com/lib/pq
+  2. # go build -tags 'postgres' -o /usr/local/bin/migrate github.com/mattes/migrate/cli
 1. Enter the core/db directory
   - `$ cd $GOPATH/src/github.com/artificial-universe-maker/core/db`
 2. Run the migrations

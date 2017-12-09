@@ -271,6 +271,22 @@ func (ara *ARASetZone) UUID() uuid.UUID {
 	return uuid.UUID(*ara)
 }
 
+func (ara ARASetZone) MarshalText() (text []byte, err error) {
+	text = []byte(ara.String())
+	return
+}
+
+func (ara *ARASetZone) UnmarshalText(text []byte) error {
+	tmp := uuid.UUID{}
+	err := tmp.UnmarshalText(text)
+	if err != nil {
+		return err
+	}
+
+	*ara = ARASetZone(tmp)
+	return nil
+}
+
 // Execute will mutate the AumMutableRuntimeState in some way
 // Whether it's the state itself or the OutputSSML
 func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
