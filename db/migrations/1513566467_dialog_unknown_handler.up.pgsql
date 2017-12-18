@@ -1,0 +1,1 @@
+ALTER TABLE workbench_dialog_nodes ADD COLUMN IF NOT EXISTS "UnknownHandler" BOOLEAN DEFAULT FALSE;

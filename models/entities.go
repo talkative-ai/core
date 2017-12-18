@@ -96,10 +96,12 @@ const (
 type AumDialogNode struct {
 	AumModel
 
-	IsRoot     *bool
-	ProjectID  uuid.UUID `json:"-"`
-	ActorID    uuid.UUID `json:"-"`
-	EntryInput AumDialogInputArray
+	IsRoot    bool
+	ProjectID uuid.UUID `json:"-"`
+	ActorID   uuid.UUID `json:"-"`
+	// Handles all other entry inputs
+	UnknownHandler bool
+	EntryInput     AumDialogInputArray
 	RawLBlock
 	ChildNodes  *[]*AumDialogNode `db:"-" json:"-"`
 	ParentNodes *[]*AumDialogNode `db:"-" json:"-"`
@@ -114,6 +116,16 @@ func (a *AumDialogNode) Scan(src interface{}) error {
 // Greeting (Example: “Hello <Actor>”)
 // Provides an Actor
 type AumDialogInput string
+
+func (input AumDialogInput) Prepared() string {
+	return strings.ToUpper(string(input))
+}
+
+const (
+	// For the "catch-all" unknown dialog handler
+	AumDialogSpecialInputUnknown string = "[UNKNOWN]"
+)
+
 type AumDialogInputArray []AumDialogInput
 
 func (a *AumDialogInputArray) Scan(src interface{}) error {

@@ -17,6 +17,7 @@ type ProjectItem struct {
 	ParentDialogID       uuid.NullUUID
 	ChildDialogID        uuid.NullUUID
 	IsRoot               bool
+	UnknownHandler       bool
 	LogicalSetAlways     string
 	LogicalSetStatements sql.NullString
 	RawLBlock
