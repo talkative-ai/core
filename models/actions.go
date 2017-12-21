@@ -332,12 +332,58 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 			return
 		}
 	}
-	// stateChange = true
-	// if stateChange {
-	// 	newID := <-eventIDChan
-	// 	stateObject, _ := message.State.Value()
-	// 	go db.Instance.QueryRow(`INSERT INTO event_state_change ("EventUserActionID", "StateObject") VALUES ($1, $2)`, newID, stateObject)
-	// }
+}
+
+////////////////
+// ARASetZone //
+////////////////
+type ARAResetApp uuid.UUID
+
+// GetAAID returns the AumActionID of the current RuntimeAction
+func (ara *ARAResetApp) GetAAID() AumActionID {
+	return AAIDResetApp
+}
+
+// Compile is used by Lakshmi
+// Returns the compiled []byte slice of the runtime action
+// To be stored in Redis
+func (ara ARAResetApp) Compile() []byte {
+	return []byte{}
+}
+
+// CreateFrom is used for evaluating the actions in Brahman and followed by Execute
+// This could be put in a single "Execute" but this is less monolothic
+func (ara *ARAResetApp) CreateFrom(bytes []byte) error {
+	*ara = ARAResetApp(uuid.Nil)
+	return nil
+}
+
+// Execute will mutate the AumMutableRuntimeState in some way
+// Whether it's the state itself or the OutputSSML
+func (ara *ARAResetApp) Execute(message *AumMutableRuntimeState) {
+	// TODO: Handle error
+	redis, _ := providers.ConnectRedis()
+	defer redis.Close()
+	// If this is nil, then the reset app is happening from inside the app
+	// as an actual action
+	if *ara == ARAResetApp(uuid.Nil) {
+		*ara = ARAResetApp(message.State.PubID)
+	} else {
+		// When it's defined, this is the initial app setup
+		message.State.PubID = uuid.UUID(*ara)
+	}
+	message.State.ZoneActors = map[uuid.UUID][]string{}
+	message.State.ZoneInitialized = map[uuid.UUID]bool{}
+	for _, zoneID := range redis.SMembers(
+		fmt.Sprintf("%v:%v", KeynavProjectMetadataStatic(message.State.PubID.String()), "all_zones")).Val() {
+		zUUID := uuid.FromStringOrNil(zoneID)
+		message.State.ZoneActors[zUUID] =
+			redis.SMembers(KeynavCompiledActorsWithinZone(message.State.PubID.String(), zoneID)).Val()
+		message.State.ZoneInitialized[zUUID] = false
+	}
+	zoneID := redis.HGet(KeynavProjectMetadataStatic(message.State.PubID.String()), "start_zone_id").Val()
+	setZone := ARASetZone(uuid.FromStringOrNil(zoneID))
+	setZone.Execute(message)
 }
 
 ////////////////////
