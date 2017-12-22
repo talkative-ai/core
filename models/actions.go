@@ -41,7 +41,7 @@ type AumActionSet struct {
 	PlaySounds            []ARAPlaySound
 	InitializeActorDialog uuid.UUID
 	SetZone               ARASetZone
-	ResetApp              bool
+	ResetApp              ARAResetApp
 }
 
 func (a *AumActionSet) Scan(src interface{}) error {
@@ -59,11 +59,11 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 	ch := make(chan AumRuntimeAction)
 	go func() {
 		defer close(ch)
-		// TODO: Add other actions in here
 		for _, r := range AAS.PlaySounds {
 			action := r
 			ch <- &action
 		}
+
 		for _, r := range AAS.SetGlobalVariables {
 			action := r
 			ch <- &action
@@ -71,6 +71,10 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 
 		if uuid.UUID(AAS.SetZone) != uuid.Nil {
 			ch <- &AAS.SetZone
+		}
+
+		if AAS.ResetApp {
+			ch <- &AAS.ResetApp
 		}
 	}()
 	return ch
@@ -337,7 +341,7 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 ////////////////
 // ARASetZone //
 ////////////////
-type ARAResetApp uuid.UUID
+type ARAResetApp bool
 
 // GetAAID returns the AumActionID of the current RuntimeAction
 func (ara *ARAResetApp) GetAAID() AumActionID {
@@ -354,7 +358,7 @@ func (ara ARAResetApp) Compile() []byte {
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
 // This could be put in a single "Execute" but this is less monolothic
 func (ara *ARAResetApp) CreateFrom(bytes []byte) error {
-	*ara = ARAResetApp(uuid.Nil)
+	*ara = true
 	return nil
 }
 
@@ -364,13 +368,10 @@ func (ara *ARAResetApp) Execute(message *AumMutableRuntimeState) {
 	// TODO: Handle error
 	redis, _ := providers.ConnectRedis()
 	defer redis.Close()
-	// If this is nil, then the reset app is happening from inside the app
-	// as an actual action
-	if *ara == ARAResetApp(uuid.Nil) {
-		*ara = ARAResetApp(message.State.PubID)
+	if *ara {
+		// The reset is happening from inside the app
 	} else {
-		// When it's defined, this is the initial app setup
-		message.State.PubID = uuid.UUID(*ara)
+		// The reset is being triggered manually
 	}
 	message.State.ZoneActors = map[uuid.UUID][]string{}
 	message.State.ZoneInitialized = map[uuid.UUID]bool{}
