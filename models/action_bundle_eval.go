@@ -18,7 +18,6 @@ func ActionBundleEval(state *AumMutableRuntimeState, bundle []byte) error {
 		}
 		actionID := binary.LittleEndian.Uint64(barr)
 		action := GetActionFromID(AumActionID(actionID))
-
 		barr, err = r.ReadNBytes(4)
 		if err != nil {
 			return err

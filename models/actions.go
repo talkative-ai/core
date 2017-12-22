@@ -167,7 +167,11 @@ func GetActionFromID(id AumActionID) AumRuntimeAction {
 		return &n
 	case AAIDSetARVariable:
 		return &ARASetVariable{}
+	case AAIDResetApp:
+		n := ARAResetApp(false)
+		return &n
 	default:
+		log.Fatalln("Unsupported action id:", id)
 		return nil
 	}
 }
