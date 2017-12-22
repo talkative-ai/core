@@ -1,1 +1,1 @@
-ALTER TABLE workbench_dialog_nodes DROP COLUMN IF EXISTS "UnknownHandler" BOOLEAN;
+ALTER TABLE workbench_dialog_nodes DROP COLUMN IF EXISTS "UnknownHandler";
