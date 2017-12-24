@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -118,7 +120,12 @@ func (a *AumDialogNode) Scan(src interface{}) error {
 type AumDialogInput string
 
 func (input AumDialogInput) Prepared() string {
-	return strings.ToUpper(string(input))
+	reg, err := regexp.Compile("[^a-zA-Z0-9 ]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	processedString := reg.ReplaceAllString(string(input), "")
+	return strings.ToUpper(processedString)
 }
 
 const (
