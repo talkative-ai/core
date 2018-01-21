@@ -1,25 +1,31 @@
-package providers
+package redis
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/go-redis/redis"
 )
 
+var Instance *redis.Client
+
 // ConnectRedis dials and returns a Redis client to query against, or abort with error
 func ConnectRedis() (*redis.Client, error) {
-	client := redis.NewClient(&redis.Options{
+
+	if os.Getenv("REDIS_ADDR") == "" {
+		os.Setenv("REDIS_ADDR", "127.0.0.1:6379")
+		os.Setenv("REDIS_PASSWORD", "")
+	}
+
+	Instance = redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_ADDR"),
 		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       0,
 	})
 
-	_, err := client.Ping().Result()
+	_, err := Instance.Ping().Result()
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 
-	return client, nil
+	return Instance, nil
 }

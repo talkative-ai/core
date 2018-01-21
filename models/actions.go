@@ -12,7 +12,7 @@ import (
 
 	"log"
 
-	"github.com/artificial-universe-maker/core/providers"
+	"github.com/artificial-universe-maker/core/redis"
 	"github.com/artificial-universe-maker/go-ssml"
 )
 
@@ -307,13 +307,7 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 
 	message.State.ZoneInitialized[message.State.Zone] = true
 
-	redis, err := providers.ConnectRedis()
-	if err != nil {
-		log.Fatal("Error connecting to redis in models actions ARASetZone Execute", err)
-		return
-	}
-
-	res := redis.HGet(
+	res := redis.Instance.HGet(
 		KeynavCompiledTriggersWithinZone(message.State.PubID.String(), ara.String()),
 		fmt.Sprintf("%v", AumTriggerInitializeZone)).Val()
 
@@ -329,7 +323,7 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 			log.Fatal("Error in SetZone with logic evaluation", res.Error)
 			return
 		}
-		bundleBinary, err := redis.Get(res.Value).Bytes()
+		bundleBinary, err := redis.Instance.Get(res.Value).Bytes()
 		if err != nil {
 			log.Fatal("Error in SetZone fetching action bundle binary", err)
 			return
@@ -369,9 +363,6 @@ func (ara *ARAResetApp) CreateFrom(bytes []byte) error {
 // Execute will mutate the AumMutableRuntimeState in some way
 // Whether it's the state itself or the OutputSSML
 func (ara *ARAResetApp) Execute(message *AumMutableRuntimeState) {
-	// TODO: Handle error
-	redis, _ := providers.ConnectRedis()
-	defer redis.Close()
 	if *ara {
 		// The reset is happening from inside the app
 	} else {
@@ -379,14 +370,14 @@ func (ara *ARAResetApp) Execute(message *AumMutableRuntimeState) {
 	}
 	message.State.ZoneActors = map[uuid.UUID][]string{}
 	message.State.ZoneInitialized = map[uuid.UUID]bool{}
-	for _, zoneID := range redis.SMembers(
+	for _, zoneID := range redis.Instance.SMembers(
 		fmt.Sprintf("%v:%v", KeynavProjectMetadataStatic(message.State.PubID.String()), "all_zones")).Val() {
 		zUUID := uuid.FromStringOrNil(zoneID)
 		message.State.ZoneActors[zUUID] =
-			redis.SMembers(KeynavCompiledActorsWithinZone(message.State.PubID.String(), zoneID)).Val()
+			redis.Instance.SMembers(KeynavCompiledActorsWithinZone(message.State.PubID.String(), zoneID)).Val()
 		message.State.ZoneInitialized[zUUID] = false
 	}
-	zoneID := redis.HGet(KeynavProjectMetadataStatic(message.State.PubID.String()), "start_zone_id").Val()
+	zoneID := redis.Instance.HGet(KeynavProjectMetadataStatic(message.State.PubID.String()), "start_zone_id").Val()
 	setZone := ARASetZone(uuid.FromStringOrNil(zoneID))
 	setZone.Execute(message)
 }
