@@ -78,9 +78,15 @@ func (arr *StringArray) Value() (driver.Value, error) {
 
 func (arr *StringArray) Scan(src interface{}) error {
 	str := string(src.([]byte))
+	if len(str) <= 1 {
+		return nil
+	}
 	str = str[1 : len(str)-1]
 	arr.Val = strings.Split(str, ",")
 	for i, v := range arr.Val {
+		if len(str) == 0 {
+			continue
+		}
 		if v[0] == '"' {
 			arr.Val[i] = v[1 : len(v)-1]
 			// Trim wrapping quotes

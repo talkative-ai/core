@@ -1,7 +1,6 @@
 package prehandle
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -10,9 +9,7 @@ import (
 	"time"
 
 	"github.com/artificial-universe-maker/core"
-	"github.com/artificial-universe-maker/core/db"
 	"github.com/artificial-universe-maker/core/myerrors"
-	"github.com/artificial-universe-maker/core/redis"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -24,23 +21,6 @@ type Prehandler func(http.ResponseWriter, *http.Request) bool
 func PreHandle(handle http.HandlerFunc, prehandlers ...Prehandler) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		// Initialize database and redis connections
-		// TODO: Make it a bit clearer that this is happening, and more maintainable
-		err := db.InitializeDB()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer db.Instance.Close()
-
-		_, err = redis.ConnectRedis()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer redis.Instance.Close()
-
 		for _, pre := range prehandlers {
 			if !pre(w, r) {
 				// The prehandler signals an abort
@@ -49,7 +29,6 @@ func PreHandle(handle http.HandlerFunc, prehandlers ...Prehandler) http.HandlerF
 		}
 		handle(w, r)
 	}
-
 }
 
 // SetJSON sets the Content-Type to application/json

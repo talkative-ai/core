@@ -7,4 +7,6 @@ const (
 	PublishStatusPublishing
 	PublishStatusPublished
 	PublishStatusProblem
+	PublishStatusUnderReview
+	PublishStatusDenied
 )

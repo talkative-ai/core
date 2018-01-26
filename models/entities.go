@@ -28,6 +28,59 @@ func (m *AumModel) PreInsert(s gorp.SqlExecutor) error {
 	return nil
 }
 
+type AumProjectCategory string
+
+const (
+	AumProjectCategoryEntertainment AumProjectCategory = "Entertainment"
+	AumProjectCategoryMiscellanious                    = "Miscellaneous"
+	AumProjectCategoryBusiness                         = "Business"
+	AumProjectCategoryEducation                        = "Education"
+)
+
+type AumProjectTag string
+type AumProjectTagArray []AumProjectTag
+
+const (
+	AumProjectTagInteractiveStory AumProjectTag = "Interactive Story"
+	AumProjectTagHumor                          = "Humor"
+	AumProjectTagAdventure                      = "Adventure"
+	AumProjectTagFiction                        = "Fiction"
+	AumProjectTagNonfiction                     = "Nonfiction"
+	AumProjectTagHistorical                     = "Historical"
+	AumProjectTagDrama                          = "Drama"
+	AumProjectTagGames                          = "Games"
+	AumProjectTagStudy                          = "Study"
+	AumProjectTagHistory                        = "History"
+	AumProjectTagEnglish                        = "English"
+	AumProjectTagScience                        = "Science"
+	AumProjectTagMath                           = "Math"
+	AumProjectTagTraining                       = "Training"
+)
+
+func (a *AumProjectTagArray) Scan(src interface{}) error {
+	arr := common.StringArray{}
+	err := arr.Scan(src)
+	if err != nil {
+		return err
+	}
+	newA := make(AumProjectTagArray, len(arr.Val))
+	for idx, v := range arr.Val {
+		newA[idx] = AumProjectTag(v)
+	}
+	*a = newA
+	return nil
+}
+
+func (arr *AumProjectTagArray) Value() (driver.Value, error) {
+	v := []string{}
+	for _, a := range *arr {
+		v = append(v, fmt.Sprintf("\"%v\"", string(a)))
+	}
+
+	s := strings.Join(v, ",")
+	return fmt.Sprintf("{%v}", s), nil
+}
+
 // AumProject is the model for a Workbench project
 type AumProject struct {
 	AumModel
@@ -36,6 +89,8 @@ type AumProject struct {
 	TeamID      uuid.UUID
 	StartZoneID uuid.NullUUID // Expected Zone ID
 	IsPrivate   bool
+	Category    AumProjectCategory
+	Tags        AumProjectTagArray
 
 	Actors               []AumActor                `db:"-"`
 	Zones                []AumZone                 `db:"-"`
