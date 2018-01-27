@@ -89,8 +89,8 @@ type AumProject struct {
 	TeamID      uuid.UUID
 	StartZoneID uuid.NullUUID // Expected Zone ID
 	IsPrivate   bool
-	Category    AumProjectCategory
-	Tags        AumProjectTagArray
+	Category    *AumProjectCategory
+	Tags        *AumProjectTagArray
 
 	Actors               []AumActor                `db:"-"`
 	Zones                []AumZone                 `db:"-"`
@@ -113,6 +113,8 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 		"Zones":      p.Zones,
 		"Actors":     p.Actors,
 		"ZoneActors": p.ZoneActors,
+		"Category":   p.Category,
+		"Tags":       p.Tags,
 	}
 
 	if p.StartZoneID.Valid {
