@@ -78,7 +78,8 @@ func (arr *StringArray) Value() (driver.Value, error) {
 
 func (arr *StringArray) Scan(src interface{}) error {
 	str := string(src.([]byte))
-	if len(str) <= 1 {
+	if len(str) <= 2 {
+		arr.Val = make([]string, 0)
 		return nil
 	}
 	str = str[1 : len(str)-1]
