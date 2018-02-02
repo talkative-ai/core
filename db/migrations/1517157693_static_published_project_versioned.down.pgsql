@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS static_published_projects_versioned CASCADE;

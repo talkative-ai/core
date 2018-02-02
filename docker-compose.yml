@@ -36,7 +36,7 @@ services:
       dockerfile: Dockerfile-dev
     volumes:
       - $GOPATH:/go:ro
-      - ../brahman:/go/src/github.com/artificial-universe-maker/lakshmi:ro
+      - ../brahman:/go/src/github.com/artificial-universe-maker/brahman:ro
     ports:
       - 9001:8080
     depends_on:
@@ -51,6 +51,20 @@ services:
       image: adminer
       ports:
           - 8001:8080
+  ganesha:
+    image: aum-ganesha
+    build:
+      dockerfile: Dockerfile-dev
+      context: ../ganesha
+    volumes:
+      - $GOPATH:/go:ro
+      - ../ganesha:/go/src/github.com/artificial-universe-maker/ganesha:ro
+    ports:
+      - 9002:8080
+    depends_on:
+      - "postgres"
+    env_file:
+      - .env
   redis:
     image: redis
     ports:
