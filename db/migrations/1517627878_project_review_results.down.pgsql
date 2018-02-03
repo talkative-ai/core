@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS project_review_results CASCADE;
+DROP TABLE IF EXISTS corp_users CASCADE;

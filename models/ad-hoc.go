@@ -7,6 +7,22 @@ import (
 	uuid "github.com/artificial-universe-maker/go.uuid"
 )
 
+type ProjectItemJSONSafe struct {
+	ProjectID            string
+	Title                string
+	ZoneID               string
+	ActorID              string
+	DialogID             string
+	DialogEntry          []string
+	ParentDialogID       string
+	ChildDialogID        string
+	IsRoot               bool
+	UnknownHandler       bool
+	LogicalSetAlways     string
+	LogicalSetStatements string
+	RawLBlock
+}
+
 type ProjectItem struct {
 	ProjectID            uuid.UUID
 	Title                string
@@ -31,6 +47,14 @@ type VersionedProject struct {
 	Tags        AumProjectTagArray
 	ProjectData ProjectItemArray
 }
+type VersionedProjectJSONSafe struct {
+	ProjectID   uuid.UUID
+	Version     int64
+	Title       string
+	Category    AumProjectCategory
+	Tags        AumProjectTagArray
+	ProjectData ProjectItemJSONSafeArray
+}
 
 type ProjectTriggerItem struct {
 	ProjectID   uuid.UUID
@@ -40,6 +64,7 @@ type ProjectTriggerItem struct {
 }
 
 type ProjectItemArray []ProjectItem
+type ProjectItemJSONSafeArray []ProjectItemJSONSafe
 
 func (a *ProjectItemArray) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)
