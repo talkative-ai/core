@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS project_review_results (
     "Reviewer" TEXT,
     "MinorProblems" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
     "SeriousProblems" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
-    "Dialogues" TEXT[][] DEFAULT ARRAY[][]::TEXT[][],
+    "Dialogues" TEXT[][]
 );
 
 CREATE TABLE IF NOT EXISTS corp_users (
