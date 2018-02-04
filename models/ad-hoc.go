@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 
 	uuid "github.com/artificial-universe-maker/go.uuid"
 )
@@ -19,7 +20,7 @@ type ProjectItemJSONSafe struct {
 	IsRoot               bool
 	UnknownHandler       bool
 	LogicalSetAlways     string
-	LogicalSetStatements string
+	LogicalSetStatements *string
 	RawLBlock
 }
 
@@ -65,6 +66,15 @@ type ProjectTriggerItem struct {
 
 type ProjectItemArray []ProjectItem
 type ProjectItemJSONSafeArray []ProjectItemJSONSafe
+
+func (p *ProjectItemJSONSafeArray) Scan(src interface{}) error {
+	source, ok := src.([]byte)
+	if !ok {
+		return errors.New("Type assertion .([]byte) failed.")
+	}
+
+	return json.Unmarshal(source, &p)
+}
 
 func (a *ProjectItemArray) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)

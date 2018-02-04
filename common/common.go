@@ -2,6 +2,7 @@ package common
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"log"
 	"math/rand"
 	"strings"
@@ -94,6 +95,20 @@ func (arr *StringArray) Scan(src interface{}) error {
 		}
 	}
 	return nil
+}
+
+type StringArray2D []StringArray
+
+func (arr *StringArray2D) Value() (driver.Value, error) {
+	var val []string
+	for _, stringArray := range *arr {
+		var stringCollection []string
+		for _, str := range stringArray.Val {
+			stringCollection = append(val, fmt.Sprintf(`"%v"`, str))
+		}
+		val = append(val, fmt.Sprintf("{%v}", strings.Join(stringCollection, `,`)))
+	}
+	return fmt.Sprintf("{%v}", strings.Join(val, `,`)), nil
 }
 
 func PseudoRand(max int) int {

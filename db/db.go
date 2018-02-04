@@ -36,7 +36,7 @@ func InitializeDB() error {
 	DBMap.AddTableWithName(models.AumDialogNode{}, "workbench_dialog_nodes")
 	DBMap.AddTableWithName(models.AumDialogRelation{}, "workbench_dialog_nodes_relations")
 	DBMap.AddTableWithName(models.AumPrivateProjectGrants{}, "workbench_private_project_grants")
-	DBMap.AddTableWithName(models.VersionedProject{}, "static_published_projects_versioned")
+	DBMap.AddTableWithName(models.VersionedProjectJSONSafe{}, "static_published_projects_versioned")
 	DBMap.AddTableWithName(models.AumNote{}, "workbench_notes")
 
 	DBMap.AddTableWithName(models.User{}, "users")
