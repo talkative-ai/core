@@ -252,14 +252,19 @@ type UUIDCreateID struct {
 	CreateID *string
 }
 
-func (u *UUIDCreateID) UnmarshalText(text []byte) error {
-	if strings.HasPrefix(string(text), "create") {
-		str := string(text)
+func (u *UUIDCreateID) UnmarshalJSON(text []byte) error {
+	// Remove quotations
+	var bytes []byte
+	if len(text) > 1 && text[0] == '"' {
+		bytes = text[1 : len(text)-1]
+	}
+	if strings.HasPrefix(string(bytes), "create") {
+		str := string(bytes)
 		u.CreateID = &str
 		return nil
 	}
 	tmp := uuid.UUID{}
-	err := tmp.UnmarshalText(text)
+	err := tmp.UnmarshalText(bytes)
 	if err != nil {
 		return err
 	}
