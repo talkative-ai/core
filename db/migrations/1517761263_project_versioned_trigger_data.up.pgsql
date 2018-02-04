@@ -1,0 +1,1 @@
+ALTER TABLE static_published_projects_versioned ADD COLUMN IF NOT EXISTS "TriggerData" JSONB;

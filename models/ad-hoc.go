@@ -3,26 +3,9 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 
 	uuid "github.com/artificial-universe-maker/go.uuid"
 )
-
-type ProjectItemJSONSafe struct {
-	ProjectID            string
-	Title                string
-	ZoneID               string
-	ActorID              string
-	DialogID             string
-	DialogEntry          []string
-	ParentDialogID       string
-	ChildDialogID        string
-	IsRoot               bool
-	UnknownHandler       bool
-	LogicalSetAlways     string
-	LogicalSetStatements *string
-	RawLBlock
-}
 
 type ProjectItem struct {
 	ProjectID            uuid.UUID
@@ -47,16 +30,8 @@ type VersionedProject struct {
 	Category    AumProjectCategory
 	Tags        AumProjectTagArray
 	ProjectData ProjectItemArray
+	TriggerData ProjectTriggerItemArray
 }
-type VersionedProjectJSONSafe struct {
-	ProjectID   uuid.UUID
-	Version     int64
-	Title       string
-	Category    AumProjectCategory
-	Tags        AumProjectTagArray
-	ProjectData ProjectItemJSONSafeArray
-}
-
 type ProjectTriggerItem struct {
 	ProjectID   uuid.UUID
 	ZoneID      uuid.UUID
@@ -65,17 +40,11 @@ type ProjectTriggerItem struct {
 }
 
 type ProjectItemArray []ProjectItem
-type ProjectItemJSONSafeArray []ProjectItemJSONSafe
-
-func (p *ProjectItemJSONSafeArray) Scan(src interface{}) error {
-	source, ok := src.([]byte)
-	if !ok {
-		return errors.New("Type assertion .([]byte) failed.")
-	}
-
-	return json.Unmarshal(source, &p)
-}
+type ProjectTriggerItemArray []ProjectTriggerItem
 
 func (a *ProjectItemArray) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
+}
+func (a *ProjectTriggerItemArray) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)
 }
