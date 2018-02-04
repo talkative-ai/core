@@ -2,6 +2,7 @@ package common
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -97,14 +98,31 @@ func (arr *StringArray) Scan(src interface{}) error {
 	return nil
 }
 
+func (arr *StringArray) UnmarshalJSON(b []byte) (err error) {
+	return json.Unmarshal(b, &arr.Val)
+}
+
 type StringArray2D []StringArray
 
 func (arr *StringArray2D) Value() (driver.Value, error) {
 	var val []string
+	largest := 0
+	// Postgres requires all sub-arrays within a 2D array to be of the same length
+	for _, stringArray := range *arr {
+		if len(stringArray.Val) > largest {
+			largest = len(stringArray.Val)
+		}
+	}
+	for idx, _ := range *arr {
+		for i := len((*arr)[idx].Val); i < largest; i++ {
+			(*arr)[idx].Val = append((*arr)[idx].Val, ``)
+		}
+	}
+
 	for _, stringArray := range *arr {
 		var stringCollection []string
 		for _, str := range stringArray.Val {
-			stringCollection = append(val, fmt.Sprintf(`"%v"`, str))
+			stringCollection = append(stringCollection, fmt.Sprintf(`"%v"`, str))
 		}
 		val = append(val, fmt.Sprintf("{%v}", strings.Join(stringCollection, `,`)))
 	}
