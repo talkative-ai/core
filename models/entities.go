@@ -258,6 +258,7 @@ func (u *UUIDCreateID) UnmarshalJSON(text []byte) error {
 	if len(text) > 1 && text[0] == '"' {
 		bytes = text[1 : len(text)-1]
 	}
+
 	if strings.HasPrefix(string(bytes), "create") {
 		str := string(bytes)
 		u.CreateID = &str

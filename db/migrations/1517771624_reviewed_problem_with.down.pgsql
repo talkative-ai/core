@@ -1,0 +1,1 @@
+ALTER TABLE project_review_results DROP COLUMN IF EXISTS "ProblemWith";

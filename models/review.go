@@ -25,6 +25,7 @@ type ProjectReview struct {
 	Result        ProjectReviewResult
 	MajorProblems ReviewMajorProblemArray
 	MinorProblems ReviewMinorProblemArray
+	ProblemWith   ReviewProblemWith
 	Dialogues     common.StringArray2D
 	ReviewedAt    gorp.NullTime
 }
@@ -50,6 +51,14 @@ type ReviewMinorProblem int64
 
 const (
 	ReviewMinorProblemConversationHangingOpen ReviewMinorProblem = iota
+	ReviewMinorProblemZoneEntryHangingOpen
+)
+
+type ReviewProblemWith int
+
+const (
+	ReviewProblemWithDialog ReviewProblemWith = iota
+	ReviewProblemWithZoneIntroductionTrigger
 )
 
 type ReviewMajorProblemArray []ReviewMajorProblem
