@@ -4,9 +4,10 @@ CREATE TABLE IF NOT EXISTS project_review_results (
     "Reviewer" TEXT,
     "Result" INTEGER,
     "BadTitle" BOOLEAN NOT NULL DEFAULT FALSE,
-    "MinorProblems" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
-    "MajorProblems" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
-    "Dialogues" TEXT[][],
+    "MinorProblems" JSONB DEFAULT '[]'::JSONB,
+    "MajorProblems" JSONB DEFAULT '[]'::JSONB,
+    "ProblemWith" INTEGER NOT NULL DEFAULT 0,
+    "Dialogues" JSONB,
     "ReviewedAt" timestamp DEFAULT current_timestamp
 );
 

@@ -98,35 +98,49 @@ func (arr *StringArray) Scan(src interface{}) error {
 	return nil
 }
 
+// TODO: Clean all this mess up. StringArray, StringArray2D, StringArray2DJSON
+// all of this seems really heavy and awkward
+
 func (arr *StringArray) UnmarshalJSON(b []byte) (err error) {
 	return json.Unmarshal(b, &arr.Val)
 }
 
 type StringArray2D []StringArray
 
-func (arr *StringArray2D) Value() (driver.Value, error) {
-	var val []string
-	largest := 0
-	// Postgres requires all sub-arrays within a 2D array to be of the same length
-	for _, stringArray := range *arr {
-		if len(stringArray.Val) > largest {
-			largest = len(stringArray.Val)
-		}
-	}
-	for idx, _ := range *arr {
-		for i := len((*arr)[idx].Val); i < largest; i++ {
-			(*arr)[idx].Val = append((*arr)[idx].Val, ``)
-		}
-	}
+func (a *StringArray2D) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
+}
 
-	for _, stringArray := range *arr {
-		var stringCollection []string
-		for _, str := range stringArray.Val {
-			stringCollection = append(stringCollection, fmt.Sprintf(`"%v"`, str))
-		}
-		val = append(val, fmt.Sprintf("{%v}", strings.Join(stringCollection, `,`)))
+func (arr *StringArray2D) Value() (driver.Value, error) {
+	return json.Marshal(&arr)
+}
+
+type StringArray2DJSON [][]string
+
+func (arr *StringArray2DJSON) UnmarshalJSON(b []byte) (err error) {
+	val := [][]string{}
+	err = json.Unmarshal(b, &val)
+	if err != nil {
+		return
 	}
-	return fmt.Sprintf("{%v}", strings.Join(val, `,`)), nil
+	*arr = StringArray2DJSON(val)
+	return nil
+}
+func (arr *StringArray2DJSON) Scan(b interface{}) (err error) {
+	val := [][]string{}
+	bytes, ok := b.([]byte)
+	if !ok {
+		return fmt.Errorf("Impossible typecast in StringArray2DJSON with value: %v+", b)
+	}
+	err = json.Unmarshal(bytes, &val)
+	if err != nil {
+		return
+	}
+	*arr = StringArray2DJSON(val)
+	return nil
+}
+func (arr *StringArray2DJSON) Value() (driver.Value, error) {
+	return json.Marshal(&arr)
 }
 
 func PseudoRand(max int) int {

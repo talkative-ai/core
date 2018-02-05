@@ -2,8 +2,7 @@ package models
 
 import (
 	"database/sql/driver"
-	"fmt"
-	"strings"
+	"encoding/json"
 
 	"github.com/artificial-universe-maker/core/common"
 	uuid "github.com/artificial-universe-maker/go.uuid"
@@ -26,11 +25,19 @@ type ProjectReview struct {
 	MajorProblems ReviewMajorProblemArray
 	MinorProblems ReviewMinorProblemArray
 	ProblemWith   ReviewProblemWith
-	Dialogues     common.StringArray2D
+	Dialogues     common.StringArray2DJSON
 	ReviewedAt    gorp.NullTime
 }
 
-type ReviewMajorProblem int64
+type ProjectReviewPublic struct {
+	BadTitle      bool
+	MajorProblems ReviewMajorProblemArray
+	MinorProblems ReviewMinorProblemArray
+	ProblemWith   ReviewProblemWith
+	Dialogues     common.StringArray2DJSON
+}
+
+type ReviewMajorProblem int
 
 const (
 	ReviewMajorProblemSexuallyExplicit ReviewMajorProblem = iota
@@ -47,7 +54,7 @@ const (
 	ReviewMajorProblemMatureContent
 )
 
-type ReviewMinorProblem int64
+type ReviewMinorProblem int
 
 const (
 	ReviewMinorProblemConversationHangingOpen ReviewMinorProblem = iota
@@ -65,21 +72,17 @@ type ReviewMajorProblemArray []ReviewMajorProblem
 type ReviewMinorProblemArray []ReviewMinorProblem
 
 func (arr *ReviewMinorProblemArray) Value() (driver.Value, error) {
-	v := []string{}
-	for _, a := range *arr {
-		v = append(v, fmt.Sprintf("%v", a))
-	}
-
-	s := strings.Join(v, ",")
-	return fmt.Sprintf("{%v}", s), nil
+	return json.Marshal(*arr)
 }
 
 func (arr *ReviewMajorProblemArray) Value() (driver.Value, error) {
-	v := []string{}
-	for _, a := range *arr {
-		v = append(v, fmt.Sprintf("%v", a))
-	}
+	return json.Marshal(*arr)
+}
 
-	s := strings.Join(v, ",")
-	return fmt.Sprintf("{%v}", s), nil
+func (a *ReviewMajorProblemArray) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
+}
+
+func (a *ReviewMinorProblemArray) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &a)
 }

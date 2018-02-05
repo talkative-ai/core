@@ -1,1 +1,0 @@
-ALTER TABLE project_review_results ADD COLUMN IF NOT EXISTS "ProblemWith" INTEGER NOT NULL DEFAULT 0;
