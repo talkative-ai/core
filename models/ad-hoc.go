@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 
 	uuid "github.com/artificial-universe-maker/go.uuid"
 )
@@ -47,4 +48,10 @@ func (a *ProjectItemArray) Scan(src interface{}) error {
 }
 func (a *ProjectTriggerItemArray) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)
+}
+
+type ProjectMetadata struct {
+	Status      PublishStatus
+	Review      *ProjectReviewPublic
+	PublishTime time.Time
 }
