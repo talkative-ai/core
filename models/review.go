@@ -4,9 +4,9 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
-	"github.com/artificial-universe-maker/core/common"
-	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-gorp/gorp"
+	"github.com/talkative-ai/core/common"
+	uuid "github.com/talkative-ai/go.uuid"
 )
 
 type ProjectReviewResult int

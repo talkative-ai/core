@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	uuid "github.com/artificial-universe-maker/go.uuid"
+	uuid "github.com/talkative-ai/go.uuid"
 )
 
 type ProjectItem struct {

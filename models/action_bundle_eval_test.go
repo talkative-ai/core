@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"testing"
 
-	ssml "github.com/artificial-universe-maker/go-ssml"
-	"github.com/artificial-universe-maker/lakshmi/prepare"
+	ssml "github.com/talkative-ai/go-ssml"
+	"github.com/talkative-ai/lakshmi/prepare"
 )
 
 func TestActionBundleEval(t *testing.T) {

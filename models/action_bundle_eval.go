@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	utilities "github.com/artificial-universe-maker/core"
+	utilities "github.com/talkative-ai/core"
 )
 
 func ActionBundleEval(state *AumMutableRuntimeState, bundle []byte) error {

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	utilities "github.com/artificial-universe-maker/core"
+	utilities "github.com/talkative-ai/core"
 
 	"encoding/binary"
 )

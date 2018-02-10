@@ -15,11 +15,11 @@ Within the context of Brahman (i.e. running AUM applications) Redis is used for 
 3. Install Docker
 4. Install docker-compose if not on Mac
 5. Download backend services
-  - `$ go get github.com/artificial-universe-maker/brahman`
-  - `$ go get github.com/artificial-universe-maker/lakshmi`
-  - `$ go get github.com/artificial-universe-maker/shiva`
+  - `$ go get github.com/talkative-ai/brahman`
+  - `$ go get github.com/talkative-ai/lakshmi`
+  - `$ go get github.com/talkative-ai/shiva`
 6. Enter the core directory *(this was automatically downloaded from step 3)*
-  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/core`
+  - `$ cd $GOPATH/src/github.com/talkative-ai/core`
 7. Run docker-compose
   - `$ docker-compose up`
 
@@ -40,7 +40,7 @@ The services should now be available on the following ports at localhost (127.0.
   1. # go get -u -d github.com/mattes/migrate/cli github.com/lib/pq
   2. # go build -tags 'postgres' -o /usr/local/bin/migrate github.com/mattes/migrate/cli
 1. Enter the core/db directory
-  - `$ cd $GOPATH/src/github.com/artificial-universe-maker/core/db`
+  - `$ cd $GOPATH/src/github.com/talkative-ai/core/db`
 2. Run the migrations
   - `$ migrate -database "postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable" -path migrations up`
 

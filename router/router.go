@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"github.com/artificial-universe-maker/core/prehandle"
 	"github.com/gorilla/mux"
+	"github.com/talkative-ai/core/prehandle"
 )
 
 // Route contains route information for multiplexing

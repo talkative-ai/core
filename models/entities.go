@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/artificial-universe-maker/core/common"
-	uuid "github.com/artificial-universe-maker/go.uuid"
+	"github.com/talkative-ai/core/common"
+	uuid "github.com/talkative-ai/go.uuid"
 	"github.com/go-gorp/gorp"
 )
 

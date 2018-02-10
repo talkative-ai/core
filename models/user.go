@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
-	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-gorp/gorp"
+	uuid "github.com/talkative-ai/go.uuid"
 )
 
 // User model for the AUM User

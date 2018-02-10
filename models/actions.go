@@ -8,12 +8,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/artificial-universe-maker/go.uuid"
+	"github.com/talkative-ai/go.uuid"
 
 	"log"
 
-	"github.com/artificial-universe-maker/core/redis"
-	"github.com/artificial-universe-maker/go-ssml"
+	"github.com/talkative-ai/core/redis"
+	"github.com/talkative-ai/go-ssml"
 )
 
 // AumActionID is an ID for each "action" type

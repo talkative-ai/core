@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	uuid "github.com/artificial-universe-maker/go.uuid"
 	"github.com/go-redis/redis"
+	uuid "github.com/talkative-ai/go.uuid"
 )
 
 type BSliceIndex struct {

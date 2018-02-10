@@ -8,9 +8,9 @@ import (
 
 	"time"
 
-	"github.com/artificial-universe-maker/core"
-	"github.com/artificial-universe-maker/core/myerrors"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/talkative-ai/core"
+	"github.com/talkative-ai/core/myerrors"
 )
 
 // Prehandler type is exactly the same as http.HandlerFunc except that a return bool is expected to indicate success/failure
