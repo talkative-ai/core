@@ -2,7 +2,7 @@ version: "3"
 
 services:
   shiva:
-    image: aum-shiva
+    image: talkative-shiva
     build:
       dockerfile: Dockerfile-dev
       context: ../shiva
@@ -16,7 +16,7 @@ services:
     env_file:
       - .env
   lakshmi:
-    image: aum-lakshmi-dev
+    image: talkative-lakshmi-dev
     build:
       context: ../lakshmi
       dockerfile: Dockerfile-dev
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
   brahman:
-    image: aum-brahman-dev
+    image: talkative-brahman-dev
     build:
       context: ../brahman
       dockerfile: Dockerfile-dev
@@ -52,7 +52,7 @@ services:
       ports:
           - 8001:8080
   ganesha:
-    image: aum-ganesha
+    image: talkative-ganesha
     build:
       dockerfile: Dockerfile-dev
       context: ../ganesha
