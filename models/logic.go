@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 )
 
-// LBlock is the RawLBlock after AumActionSet has been bundled
+// LBlock is the RawLBlock after ActionSet has been bundled
 type LBlock struct {
 	// AlwaysExec are actions that have no conditions
 	AlwaysExec string
@@ -29,9 +29,9 @@ type LBlock struct {
 	Statements *[][]LStatement
 }
 
-// LStatement is the RawLStatement after AumActionSet has been bundled
-// The OrGroup must yield true for the Exec AumActionSet to execute
-// Exec mutates the runtimes state of an AUM instance
+// LStatement is the RawLStatement after ActionSet has been bundled
+// The OrGroup must yield true for the Exec ActionSet to execute
+// Exec mutates the runtimes state of an Talkative instance
 type LStatement struct {
 	Operators *OrGroup
 	Exec      string
@@ -40,7 +40,7 @@ type LStatement struct {
 // RawLBlock contains every execution block
 // This model is database-friendly and pre-compiled
 type RawLBlock struct {
-	AlwaysExec AumActionSet
+	AlwaysExec ActionSet
 	Statements *RawLStatementUnified
 }
 
@@ -60,7 +60,7 @@ func (a *RawLStatementUnified) Value() (driver.Value, error) {
 // RawLStatement contains an OrGroup of AndGroups
 type RawLStatement struct {
 	Operators *OrGroup
-	Exec      AumActionSet
+	Exec      ActionSet
 }
 
 // VarValMap contains a mapping of variables
@@ -69,12 +69,12 @@ type VarValMap map[int]interface{}
 
 // AndGroup contains a map of operators with VarValMaps
 // All variables when compared to their values with respect to OperatorStr
-// must yield true in order for a RawLStatement to execute its Exec AumActionSet
+// must yield true in order for a RawLStatement to execute its Exec ActionSet
 type AndGroup map[OperatorStr]VarValMap
 
 // OrGroup contains a list of AndGroups
 // At least one AndGroup must yield true in order for
-// a RawLStatement to execute its Exec AumActionSet
+// a RawLStatement to execute its Exec ActionSet
 type OrGroup []AndGroup
 
 // OperatorStr allows a workbench user to create conditional logic

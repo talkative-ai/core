@@ -8,7 +8,7 @@ import (
 )
 
 type EventUserActon struct {
-	AumModel
+	Model
 	UserID   uuid.UUID
 	PubID    uuid.UUID
 	RawInput string
@@ -16,7 +16,7 @@ type EventUserActon struct {
 
 type EventStateChange struct {
 	EventUserActionID string
-	StateObject       MutableRuntimeState
+	StateObject       MutableAIRequestState
 	CreatedAt         gorp.NullTime `json:"CreatedAt,omitempty"`
 }
 

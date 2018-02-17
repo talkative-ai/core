@@ -9,69 +9,69 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-gorp/gorp"
 	"github.com/talkative-ai/core/common"
 	uuid "github.com/talkative-ai/go.uuid"
-	"github.com/go-gorp/gorp"
 )
 
-// AumModel is an embedded struct of common model fields
-type AumModel struct {
+// Model is an embedded struct of common model fields
+type Model struct {
 	ID          uuid.UUID     `db:"ID, primarykey, autoincrement"`
 	CreateID    *string       `db:"-" json:",omitempty"`
 	CreatedAt   gorp.NullTime `json:"CreatedAt,omitempty"`
 	PatchAction *PatchAction  `json:",omitempty" db:"-"`
 }
 
-func (m *AumModel) PreInsert(s gorp.SqlExecutor) error {
+func (m *Model) PreInsert(s gorp.SqlExecutor) error {
 	m.CreatedAt.Time = time.Now()
 	m.CreatedAt.Valid = true
 	return nil
 }
 
-type AumProjectCategory string
+type ProjectCategory string
 
 const (
-	AumProjectCategoryEntertainment AumProjectCategory = "Entertainment"
-	AumProjectCategoryMiscellanious                    = "Miscellaneous"
-	AumProjectCategoryBusiness                         = "Business"
-	AumProjectCategoryEducation                        = "Education"
+	ProjectCategoryEntertainment ProjectCategory = "Entertainment"
+	ProjectCategoryMiscellanious                 = "Miscellaneous"
+	ProjectCategoryBusiness                      = "Business"
+	ProjectCategoryEducation                     = "Education"
 )
 
-type AumProjectTag string
-type AumProjectTagArray []AumProjectTag
+type ProjectTag string
+type ProjectTagArray []ProjectTag
 
 const (
-	AumProjectTagInteractiveStory AumProjectTag = "Interactive Story"
-	AumProjectTagHumor                          = "Humor"
-	AumProjectTagAdventure                      = "Adventure"
-	AumProjectTagFiction                        = "Fiction"
-	AumProjectTagNonfiction                     = "Nonfiction"
-	AumProjectTagHistorical                     = "Historical"
-	AumProjectTagDrama                          = "Drama"
-	AumProjectTagGames                          = "Games"
-	AumProjectTagStudy                          = "Study"
-	AumProjectTagHistory                        = "History"
-	AumProjectTagEnglish                        = "English"
-	AumProjectTagScience                        = "Science"
-	AumProjectTagMath                           = "Math"
-	AumProjectTagTraining                       = "Training"
+	ProjectTagInteractiveStory ProjectTag = "Interactive Story"
+	ProjectTagHumor                       = "Humor"
+	ProjectTagAdventure                   = "Adventure"
+	ProjectTagFiction                     = "Fiction"
+	ProjectTagNonfiction                  = "Nonfiction"
+	ProjectTagHistorical                  = "Historical"
+	ProjectTagDrama                       = "Drama"
+	ProjectTagGames                       = "Games"
+	ProjectTagStudy                       = "Study"
+	ProjectTagHistory                     = "History"
+	ProjectTagEnglish                     = "English"
+	ProjectTagScience                     = "Science"
+	ProjectTagMath                        = "Math"
+	ProjectTagTraining                    = "Training"
 )
 
-func (a *AumProjectTagArray) Scan(src interface{}) error {
+func (a *ProjectTagArray) Scan(src interface{}) error {
 	arr := common.StringArray{}
 	err := arr.Scan(src)
 	if err != nil {
 		return err
 	}
-	newA := make(AumProjectTagArray, len(arr.Val))
+	newA := make(ProjectTagArray, len(arr.Val))
 	for idx, v := range arr.Val {
-		newA[idx] = AumProjectTag(v)
+		newA[idx] = ProjectTag(v)
 	}
 	*a = newA
 	return nil
 }
 
-func (arr *AumProjectTagArray) Value() (driver.Value, error) {
+func (arr *ProjectTagArray) Value() (driver.Value, error) {
 	v := []string{}
 	for _, a := range *arr {
 		v = append(v, fmt.Sprintf("\"%v\"", string(a)))
@@ -81,31 +81,31 @@ func (arr *AumProjectTagArray) Value() (driver.Value, error) {
 	return fmt.Sprintf("{%v}", s), nil
 }
 
-// AumProject is the model for a Workbench project
-type AumProject struct {
-	AumModel
+// Project is the model for a Workbench project
+type Project struct {
+	Model
 
 	Title       string
 	TeamID      uuid.UUID
 	StartZoneID uuid.NullUUID // Expected Zone ID
 	IsPrivate   bool
-	Category    *AumProjectCategory
-	Tags        *AumProjectTagArray
+	Category    *ProjectCategory
+	Tags        *ProjectTagArray
 
-	Actors               []AumActor                `db:"-"`
-	Zones                []AumZone                 `db:"-"`
-	ZoneActors           []AumZoneActor            `db:"-"`
-	PrivateProjectGrants []AumPrivateProjectGrants `db:"-"`
-	Notes                []AumNote                 `db:"-"`
+	Actors               []Actor                `db:"-"`
+	Zones                []Zone                 `db:"-"`
+	ZoneActors           []ZoneActor            `db:"-"`
+	PrivateProjectGrants []PrivateProjectGrants `db:"-"`
+	Notes                []Note                 `db:"-"`
 }
 
-type AumPublishedProject struct {
+type PublishedProject struct {
 	ProjectID uuid.UUID
 	TeamID    uuid.UUID
 	CreatedAt gorp.NullTime `json:"CreatedAt,omitempty"`
 }
 
-func (p AumProject) PrepareMarshal() map[string]interface{} {
+func (p Project) PrepareMarshal() map[string]interface{} {
 	result := map[string]interface{}{
 		"ID":         p.ID,
 		"Title":      p.Title,
@@ -124,59 +124,59 @@ func (p AumProject) PrepareMarshal() map[string]interface{} {
 	return result
 }
 
-type AumPrivateProjectGrants struct {
+type PrivateProjectGrants struct {
 	ID        uuid.UUID `db:"ID, primarykey, autoincrement"`
 	ProjectID uuid.UUID
 	UserID    uuid.UUID
 }
 
-// AEID is an AumEntityID
+// AEID is an EntityID
 // Useful for Redis key mapping
 type AEID int
 
 const (
-	// AEIDActor AumEntityID for Actor
+	// AEIDActor EntityID for Actor
 	AEIDActor AEID = iota
 
-	// AEIDZone AumEntityID for Zone
+	// AEIDZone EntityID for Zone
 	AEIDZone
 
-	// AEIDTrigger AumEntityID for Trigger
+	// AEIDTrigger EntityID for Trigger
 	AEIDTrigger
-	// AEIDDialogNode AumEntityID for DialogNode
+	// AEIDDialogNode EntityID for DialogNode
 	AEIDDialogNode
-	// AEIDActionBundle AumEntityID for ActionBundle
+	// AEIDActionBundle EntityID for ActionBundle
 	AEIDActionBundle
 )
 
-// AumDialogNode is a single instance of a Dialog
+// DialogNode is a single instance of a Dialog
 // If ParentNodes == nil, then it's the entry of a dialog
 // If ChildNodes == nil, then it's the end of the dialog
-type AumDialogNode struct {
-	AumModel
+type DialogNode struct {
+	Model
 
 	IsRoot    bool
 	ProjectID uuid.UUID `json:"-"`
 	ActorID   uuid.UUID `json:"-"`
 	// Handles all other entry inputs
 	UnknownHandler bool
-	EntryInput     AumDialogInputArray
+	EntryInput     DialogInputArray
 	RawLBlock
-	ChildNodes  *[]*AumDialogNode `db:"-" json:"-"`
-	ParentNodes *[]*AumDialogNode `db:"-" json:"-"`
+	ChildNodes  *[]*DialogNode `db:"-" json:"-"`
+	ParentNodes *[]*DialogNode `db:"-" json:"-"`
 }
 
-func (a *AumDialogNode) Scan(src interface{}) error {
+func (a *DialogNode) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)
 }
 
-// AumDialogInput indicates valid dialog entry types
-// As specified in https://aum.ai
+// DialogInput indicates valid dialog entry types
+// As specified in https://talkative.ai
 // Greeting (Example: “Hello <Actor>”)
 // Provides an Actor
-type AumDialogInput string
+type DialogInput string
 
-func (input AumDialogInput) Prepared() string {
+func (input DialogInput) Prepared() string {
 	reg, err := regexp.Compile("[^a-zA-Z0-9 ]+")
 	if err != nil {
 		log.Fatal(err)
@@ -187,26 +187,26 @@ func (input AumDialogInput) Prepared() string {
 
 const (
 	// For the "catch-all" unknown dialog handler
-	AumDialogSpecialInputUnknown string = "[UNKNOWN]"
+	DialogSpecialInputUnknown string = "[UNKNOWN]"
 )
 
-type AumDialogInputArray []AumDialogInput
+type DialogInputArray []DialogInput
 
-func (a *AumDialogInputArray) Scan(src interface{}) error {
+func (a *DialogInputArray) Scan(src interface{}) error {
 	arr := common.StringArray{}
 	err := arr.Scan(src)
 	if err != nil {
 		return err
 	}
-	newA := make(AumDialogInputArray, len(arr.Val))
+	newA := make(DialogInputArray, len(arr.Val))
 	for idx, v := range arr.Val {
-		newA[idx] = AumDialogInput(v)
+		newA[idx] = DialogInput(v)
 	}
 	*a = newA
 	return nil
 }
 
-func (arr *AumDialogInputArray) Value() (driver.Value, error) {
+func (arr *DialogInputArray) Value() (driver.Value, error) {
 	v := []string{}
 	for _, a := range *arr {
 		v = append(v, fmt.Sprintf("\"%v\"", string(a)))
@@ -217,26 +217,26 @@ func (arr *AumDialogInputArray) Value() (driver.Value, error) {
 }
 
 const (
-	// AumDialogInputStatementVerb Verb statement
+	// DialogInputStatementVerb Verb statement
 	// (Example: “I will <Verb> the <Actor>”)
 	// Provides a Verb and an Actor
-	AumDialogInputStatementVerb AumDialogInput = "statement_verb"
-	// AumDialogInputGreeting Generic greeting
+	DialogInputStatementVerb DialogInput = "statement_verb"
+	// DialogInputGreeting Generic greeting
 	// (Example: "Hello <Actor>")
 	// Provides an optional Actor
-	AumDialogInputGreeting AumDialogInput = "statement_greeting"
-	// AumDialogInputFarewell Generic farewell
+	DialogInputGreeting DialogInput = "statement_greeting"
+	// DialogInputFarewell Generic farewell
 	// (Example: "Goodbye <Actor>")
 	// Provides an optional Actor
-	AumDialogInputFarewell AumDialogInput = "statement_farewell"
-	// AumDialogInputQuestionVerb Verb question
+	DialogInputFarewell DialogInput = "statement_farewell"
+	// DialogInputQuestionVerb Verb question
 	// (Example: “Did you <Verb> the <Actor>?”)
 	// Provides a Verb and an Actor
-	AumDialogInputQuestionVerb AumDialogInput = "question_verb"
-	// AumDialogInputQuestionPossessional Possessional question
+	DialogInputQuestionVerb DialogInput = "question_verb"
+	// DialogInputQuestionPossessional Possessional question
 	// (Example: “Do you have <Actor>?”)
 	// Provides an Actor
-	AumDialogInputQuestionPossessional AumDialogInput = "question_possessional"
+	DialogInputQuestionPossessional DialogInput = "question_possessional"
 )
 
 type PatchAction uint8
@@ -274,57 +274,57 @@ func (u *UUIDCreateID) UnmarshalJSON(text []byte) error {
 	return nil
 }
 
-// AumActor model for the Actor entities
-type AumActor struct {
-	AumModel
+// Actor model for the Actor entities
+type Actor struct {
+	Model
 
 	Title           string
-	ProjectID       uuid.UUID           `json:"-"`
-	Dialogs         []AumDialogNode     `json:",omitempty" db:"-"`
-	DialogRelations []AumDialogRelation `json:",omitempty" db:"-"`
+	ProjectID       uuid.UUID        `json:"-"`
+	Dialogs         []DialogNode     `json:",omitempty" db:"-"`
+	DialogRelations []DialogRelation `json:",omitempty" db:"-"`
 }
 
-type AumDialogRelation struct {
+type DialogRelation struct {
 	ParentNodeID UUIDCreateID
 	ChildNodeID  UUIDCreateID
 	PatchAction  *PatchAction `json:",omitempty" db:"-"`
 }
 
-// AumZone model for the Zone entities
-type AumZone struct {
-	AumModel
+// Zone model for the Zone entities
+type Zone struct {
+	Model
 
 	ProjectID   uuid.UUID `json:"-"`
 	Title       string
 	Description string
-	Triggers    map[AumTriggerType]AumTrigger `db:"-"`
+	Triggers    map[TriggerType]Trigger `db:"-"`
 }
 
-type AumZoneActor struct {
+type ZoneActor struct {
 	ZoneID      UUIDCreateID
 	ActorID     UUIDCreateID
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
 
-type AumTriggerType int
+type TriggerType int
 
 const (
-	AumTriggerInitializeZone AumTriggerType = iota
-	AumTriggerEnterZone
-	AumTriggerExitZone
-	AumTriggerVariableUpdate
+	TriggerInitializeZone TriggerType = iota
+	TriggerEnterZone
+	TriggerExitZone
+	TriggerVariableUpdate
 )
 
-// AumTrigger model for Trigger entities
-type AumTrigger struct {
-	TriggerType AumTriggerType
+// Trigger model for Trigger entities
+type Trigger struct {
+	TriggerType TriggerType
 	ZoneID      UUIDCreateID
 	RawLBlock
 	PatchAction *PatchAction `json:",omitempty" db:"-"`
 }
 
-// AumNote model for the Note entities
-type AumNote struct {
-	AumModel
+// Note model for the Note entities
+type Note struct {
+	Model
 	Text string
 }

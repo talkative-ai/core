@@ -8,9 +8,9 @@ import (
 	uuid "github.com/talkative-ai/go.uuid"
 )
 
-// User model for the AUM User
+// User model for the Talkative User
 type User struct {
-	AumModel    `json:"-"`
+	Model       `json:"-"`
 	GivenName   string
 	FamilyName  string
 	Email       string
@@ -35,7 +35,7 @@ type UpgradeItem struct {
 // Team model relates multiple users under the same umbrella
 // If the Name is null, then it's the user by themselves
 type Team struct {
-	AumModel
+	Model
 	Name sql.NullString
 }
 

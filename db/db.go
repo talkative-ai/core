@@ -29,15 +29,15 @@ func InitializeDB() error {
 
 	DBMap = &gorp.DbMap{Db: Instance.DB, Dialect: gorp.PostgresDialect{}}
 
-	DBMap.AddTableWithName(models.AumProject{}, "workbench_projects")
-	DBMap.AddTableWithName(models.AumZone{}, "workbench_zones")
-	DBMap.AddTableWithName(models.AumActor{}, "workbench_actors")
-	DBMap.AddTableWithName(models.AumZoneActor{}, "workbench_zones_actors")
-	DBMap.AddTableWithName(models.AumDialogNode{}, "workbench_dialog_nodes")
-	DBMap.AddTableWithName(models.AumDialogRelation{}, "workbench_dialog_nodes_relations")
-	DBMap.AddTableWithName(models.AumPrivateProjectGrants{}, "workbench_private_project_grants")
+	DBMap.AddTableWithName(models.Project{}, "workbench_projects")
+	DBMap.AddTableWithName(models.Zone{}, "workbench_zones")
+	DBMap.AddTableWithName(models.Actor{}, "workbench_actors")
+	DBMap.AddTableWithName(models.ZoneActor{}, "workbench_zones_actors")
+	DBMap.AddTableWithName(models.DialogNode{}, "workbench_dialog_nodes")
+	DBMap.AddTableWithName(models.DialogRelation{}, "workbench_dialog_nodes_relations")
+	DBMap.AddTableWithName(models.PrivateProjectGrants{}, "workbench_private_project_grants")
 	DBMap.AddTableWithName(models.VersionedProject{}, "static_published_projects_versioned")
-	DBMap.AddTableWithName(models.AumNote{}, "workbench_notes")
+	DBMap.AddTableWithName(models.Note{}, "workbench_notes")
 
 	DBMap.AddTableWithName(models.User{}, "users")
 	DBMap.AddTableWithName(models.Team{}, "teams")

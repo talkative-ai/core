@@ -16,47 +16,47 @@ import (
 	"github.com/talkative-ai/go-ssml"
 )
 
-// AumActionID is an ID for each "action" type
+// ActionID is an ID for each "action" type
 // Used in Lakshmi compilation process
 // And in Brahman runtime process
-type AumActionID uint64
+type ActionID uint64
 
 const (
-	// AAIDSetGlobalVariable AumActionID for SetGlobalVariable
-	AAIDSetARVariable AumActionID = iota
-	// AAIDPlaySound AumActionID for PlaySound
-	AAIDPlaySound
-	// AAIDInitializeActorDialog AumActionID for InitializeActorDialog
-	AAIDInitializeActorDialog
-	// AAIDSetZone AumActionID for SetZone
-	AAIDSetZone
-	// AAIDResetApp AumActionID for ResetApp
-	AAIDResetApp
+	// RAIDSetGlobalVariable ActionID for SetGlobalVariable
+	RAIDSetARVariable ActionID = iota
+	// RAIDPlaySound ActionID for PlaySound
+	RAIDPlaySound
+	// RAIDInitializeActorDialog ActionID for InitializeActorDialog
+	RAIDInitializeActorDialog
+	// RAIDSetZone ActionID for SetZone
+	RAIDSetZone
+	// RAIDResetApp ActionID for ResetApp
+	RAIDResetApp
 )
 
-// AumActionSet is a pre-bundled set of actions
+// ActionSet is a pre-bundled set of actions
 // These actions either mutate the runtime state or mutate the output dialog
-type AumActionSet struct {
-	SetGlobalVariables    []ARASetVariable
-	PlaySounds            []ARAPlaySound
+type ActionSet struct {
+	SetGlobalVariables    []RASetVariable
+	PlaySounds            []RAPlaySound
 	InitializeActorDialog uuid.UUID
-	SetZone               ARASetZone
-	ResetApp              ARAResetApp
+	SetZone               RASetZone
+	ResetApp              RAResetApp
 }
 
-func (a *AumActionSet) Scan(src interface{}) error {
+func (a *ActionSet) Scan(src interface{}) error {
 	return json.Unmarshal(src.([]byte), &a)
 }
 
-func (a *AumActionSet) Value() (driver.Value, error) {
+func (a *ActionSet) Value() (driver.Value, error) {
 	return json.Marshal(a)
 }
 
-// Iterable will output all of the AumRuntimeActions within the AumActionSet
+// Iterable will output all of the RequestActions within the ActionSet
 // This is useful for easily bundling actions within Lakshmi
 // Without having to create ad hoc functions
-func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
-	ch := make(chan AumRuntimeAction)
+func (AAS ActionSet) Iterable() <-chan RequestAction {
+	ch := make(chan RequestAction)
 	go func() {
 		defer close(ch)
 		for _, r := range AAS.PlaySounds {
@@ -80,15 +80,15 @@ func (AAS AumActionSet) Iterable() <-chan AumRuntimeAction {
 	return ch
 }
 
-// AumMutableRuntimeState is used by Brahman
+// AIRequest is used by Brahman
 // It contains the current State of the running game / project (called the runtime state)
 // and the OutputSSML, Speech-synthesis markup language
-type AumMutableRuntimeState struct {
-	State      MutableRuntimeState
+type AIRequest struct {
+	State      MutableAIRequestState
 	OutputSSML ssml.Builder
 }
 
-type MutableRuntimeState struct {
+type MutableAIRequestState struct {
 	Zone            uuid.UUID
 	PubID           uuid.UUID
 	CurrentDialog   *string
@@ -117,13 +117,13 @@ func (arv *ARVariable) Get() interface{} {
 	return v
 }
 
-func (a *MutableRuntimeState) Value() (driver.Value, error) {
+func (a *MutableAIRequestState) Value() (driver.Value, error) {
 	return json.Marshal(a)
 }
 
-// AumRuntimeAction is an interface for all the actions within an AumActionSet
-// Combined with the AumActionSet Iterable(), compilation is easy
-type AumRuntimeAction interface {
+// RequestAction is an interface for all the actions within an ActionSet
+// Combined with the ActionSet Iterable(), compilation is easy
+type RequestAction interface {
 	// Compile is used by Lakshmi
 	// Returns the compiled []byte slice of the runtime action
 	Compile() []byte
@@ -131,44 +131,44 @@ type AumRuntimeAction interface {
 	// CreateFrom is useful for testing
 	CreateFrom([]byte) error
 
-	// GetAAID returns the AumActionID of the current RuntimeAction
+	// GetRAID returns the ActionID of the current RequestAction
 	// Useful for Lakshmi
-	GetAAID() AumActionID
+	GetRAID() ActionID
 
-	// Execute will mutate the AumMutableRuntimeState in some way
+	// Execute will mutate the AIRequest in some way
 	// Whether it's the state itself or the OutputSSML
-	Execute(*AumMutableRuntimeState)
+	Execute(*AIRequest)
 }
 
-// ARAPlaySoundType is an enum of different ARAPlaySound types
+// RAPlaySoundType is an enum of different RAPlaySound types
 // (Speech-synthesis or Audio File)
-type ARAPlaySoundType uint8
+type RAPlaySoundType uint8
 
 const (
-	// ARAPlaySoundTypeText Speech-synthesis
-	ARAPlaySoundTypeText ARAPlaySoundType = iota
-	// ARAPlaySoundTypeAudio URL to an audio file
-	ARAPlaySoundTypeAudio
+	// RAPlaySoundTypeText Speech-synthesis
+	RAPlaySoundTypeText RAPlaySoundType = iota
+	// RAPlaySoundTypeAudio URL to an audio file
+	RAPlaySoundTypeAudio
 )
 
-// ARAPlaySound AumRuntimeAction PlaySound
-// This action mutates the OutputSSML of the AumMutableRuntimeState
-type ARAPlaySound struct {
-	SoundType ARAPlaySoundType
+// RAPlaySound RequestAction PlaySound
+// This action mutates the OutputSSML of the AIRequest
+type RAPlaySound struct {
+	SoundType RAPlaySoundType
 	Val       interface{}
 }
 
-func GetActionFromID(id AumActionID) AumRuntimeAction {
+func GetActionFromID(id ActionID) RequestAction {
 	switch id {
-	case AAIDPlaySound:
-		return &ARAPlaySound{}
-	case AAIDSetZone:
-		n := ARASetZone(uuid.Nil)
+	case RAIDPlaySound:
+		return &RAPlaySound{}
+	case RAIDSetZone:
+		n := RASetZone(uuid.Nil)
 		return &n
-	case AAIDSetARVariable:
-		return &ARASetVariable{}
-	case AAIDResetApp:
-		n := ARAResetApp(false)
+	case RAIDSetARVariable:
+		return &RASetVariable{}
+	case RAIDResetApp:
+		n := RAResetApp(false)
 		return &n
 	default:
 		log.Fatalln("Unsupported action id:", id)
@@ -177,25 +177,25 @@ func GetActionFromID(id AumActionID) AumRuntimeAction {
 }
 
 //////////////////
-// ARAPlaySound //
+// RAPlaySound //
 //////////////////
 
-// GetAAID returns the AumActionID of the current RuntimeAction
-func (ara ARAPlaySound) GetAAID() AumActionID {
-	return AAIDPlaySound
+// GetRAID returns the ActionID of the current RequestAction
+func (ara RAPlaySound) GetRAID() ActionID {
+	return RAIDPlaySound
 }
 
 // Compile is used by Lakshmi
 // Returns the compiled []byte slice of the runtime action
 // To be stored in Redis
-func (ara ARAPlaySound) Compile() []byte {
+func (ara RAPlaySound) Compile() []byte {
 	compiled := []byte{}
 	compiled = append(compiled, byte(ara.SoundType))
 	switch ara.SoundType {
-	case ARAPlaySoundTypeText:
+	case RAPlaySoundTypeText:
 		compiled = append(compiled, []byte(ara.Val.(string))...)
 		break
-	case ARAPlaySoundTypeAudio:
+	case RAPlaySoundTypeAudio:
 		compiled = append(compiled, []byte(ara.Val.(*url.URL).String())...)
 		break
 	}
@@ -205,14 +205,14 @@ func (ara ARAPlaySound) Compile() []byte {
 
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
 // This could be put in a single "Execute" but this is less monolothic
-func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
-	ara.SoundType = ARAPlaySoundType(bytes[0])
+func (ara *RAPlaySound) CreateFrom(bytes []byte) error {
+	ara.SoundType = RAPlaySoundType(bytes[0])
 	bytes = bytes[1:]
 	switch ara.SoundType {
-	case ARAPlaySoundTypeText:
+	case RAPlaySoundTypeText:
 		ara.Val = string(bytes)
 		break
-	case ARAPlaySoundTypeAudio:
+	case RAPlaySoundTypeAudio:
 		var err error
 		ara.Val, err = url.Parse(string(bytes))
 		if err != nil {
@@ -222,15 +222,15 @@ func (ara *ARAPlaySound) CreateFrom(bytes []byte) error {
 	return nil
 }
 
-// Execute will mutate the AumMutableRuntimeState in some way
+// Execute will mutate the AIRequest in some way
 // Whether it's the state itself or the OutputSSML
-func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
+func (ara RAPlaySound) Execute(state *AIRequest) {
 	switch ara.SoundType {
-	case ARAPlaySoundTypeText:
+	case RAPlaySoundTypeText:
 		r, err := regexp.Compile(`{{\w+}}`)
 		v := ara.Val.(string)
 		if err != nil {
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 		newv := r.ReplaceAllFunc([]byte(v), func(b []byte) []byte {
@@ -241,63 +241,63 @@ func (ara ARAPlaySound) Execute(state *AumMutableRuntimeState) {
 		})
 		state.OutputSSML = state.OutputSSML.Paragraph(string(newv))
 		break
-	case ARAPlaySoundTypeAudio:
+	case RAPlaySoundTypeAudio:
 		state.OutputSSML = state.OutputSSML.Audio(ara.Val.(*url.URL))
 		break
 	}
 }
 
 ////////////////
-// ARASetZone //
+// RASetZone //
 ////////////////
-type ARASetZone uuid.UUID
+type RASetZone uuid.UUID
 
-// GetAAID returns the AumActionID of the current RuntimeAction
-func (ara *ARASetZone) GetAAID() AumActionID {
-	return AAIDSetZone
+// GetRAID returns the ActionID of the current RequestAction
+func (ara *RASetZone) GetRAID() ActionID {
+	return RAIDSetZone
 }
 
 // Compile is used by Lakshmi
 // Returns the compiled []byte slice of the runtime action
 // To be stored in Redis
-func (ara ARASetZone) Compile() []byte {
+func (ara RASetZone) Compile() []byte {
 	return uuid.UUID(ara).Bytes()
 }
 
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
 // This could be put in a single "Execute" but this is less monolothic
-func (ara *ARASetZone) CreateFrom(bytes []byte) error {
-	*ara = ARASetZone(uuid.FromBytesOrNil(bytes))
+func (ara *RASetZone) CreateFrom(bytes []byte) error {
+	*ara = RASetZone(uuid.FromBytesOrNil(bytes))
 	return nil
 }
 
-func (ara *ARASetZone) String() string {
+func (ara *RASetZone) String() string {
 	return uuid.UUID(*ara).String()
 }
 
-func (ara *ARASetZone) UUID() uuid.UUID {
+func (ara *RASetZone) UUID() uuid.UUID {
 	return uuid.UUID(*ara)
 }
 
-func (ara ARASetZone) MarshalText() (text []byte, err error) {
+func (ara RASetZone) MarshalText() (text []byte, err error) {
 	text = []byte(ara.String())
 	return
 }
 
-func (ara *ARASetZone) UnmarshalText(text []byte) error {
+func (ara *RASetZone) UnmarshalText(text []byte) error {
 	tmp := uuid.UUID{}
 	err := tmp.UnmarshalText(text)
 	if err != nil {
 		return err
 	}
 
-	*ara = ARASetZone(tmp)
+	*ara = RASetZone(tmp)
 	return nil
 }
 
-// Execute will mutate the AumMutableRuntimeState in some way
+// Execute will mutate the AIRequest in some way
 // Whether it's the state itself or the OutputSSML
-func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
+func (ara *RASetZone) Execute(message *AIRequest) {
 	message.State.Zone = ara.UUID()
 	message.State.CurrentDialog = nil
 
@@ -309,14 +309,14 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 
 	res := redis.Instance.HGet(
 		KeynavCompiledTriggersWithinZone(message.State.PubID.String(), ara.String()),
-		fmt.Sprintf("%v", AumTriggerInitializeZone)).Val()
+		fmt.Sprintf("%v", TriggerInitializeZone)).Val()
 
 	// There is no initialize trigger
 	if res == "" {
 		return
 	}
 
-	stateComms := make(chan AumMutableRuntimeState)
+	stateComms := make(chan AIRequest)
 	result := LogicLazyEval(stateComms, []byte(res))
 	for res := range result {
 		if res.Error != nil {
@@ -337,32 +337,32 @@ func (ara *ARASetZone) Execute(message *AumMutableRuntimeState) {
 }
 
 ////////////////
-// ARASetZone //
+// RASetZone //
 ////////////////
-type ARAResetApp bool
+type RAResetApp bool
 
-// GetAAID returns the AumActionID of the current RuntimeAction
-func (ara *ARAResetApp) GetAAID() AumActionID {
-	return AAIDResetApp
+// GetRAID returns the ActionID of the current RequestAction
+func (ara *RAResetApp) GetRAID() ActionID {
+	return RAIDResetApp
 }
 
 // Compile is used by Lakshmi
 // Returns the compiled []byte slice of the runtime action
 // To be stored in Redis
-func (ara ARAResetApp) Compile() []byte {
+func (ara RAResetApp) Compile() []byte {
 	return []byte{}
 }
 
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
 // This could be put in a single "Execute" but this is less monolothic
-func (ara *ARAResetApp) CreateFrom(bytes []byte) error {
+func (ara *RAResetApp) CreateFrom(bytes []byte) error {
 	*ara = true
 	return nil
 }
 
-// Execute will mutate the AumMutableRuntimeState in some way
+// Execute will mutate the AIRequest in some way
 // Whether it's the state itself or the OutputSSML
-func (ara *ARAResetApp) Execute(message *AumMutableRuntimeState) {
+func (ara *RAResetApp) Execute(message *AIRequest) {
 	if *ara {
 		// The reset is happening from inside the app
 	} else {
@@ -378,12 +378,12 @@ func (ara *ARAResetApp) Execute(message *AumMutableRuntimeState) {
 		message.State.ZoneInitialized[zUUID] = false
 	}
 	zoneID := redis.Instance.HGet(KeynavProjectMetadataStatic(message.State.PubID.String()), "start_zone_id").Val()
-	setZone := ARASetZone(uuid.FromStringOrNil(zoneID))
+	setZone := RASetZone(uuid.FromStringOrNil(zoneID))
 	setZone.Execute(message)
 }
 
 ////////////////////
-// ARASetVariable //
+// RASetVariable //
 ////////////////////
 type SetVariableOperation int
 
@@ -415,7 +415,7 @@ const (
 	SVOReplace
 )
 
-type ARASetVariable struct {
+type RASetVariable struct {
 	Target    string
 	Operation SetVariableOperation
 	With      ParametizedARVariable
@@ -428,28 +428,28 @@ type ParametizedARVariable struct {
 	ARVariable *ARVariable
 }
 
-// GetAAID returns the AumActionID of the current RuntimeAction
-func (ara *ARASetVariable) GetAAID() AumActionID {
-	return AAIDSetARVariable
+// GetRAID returns the ActionID of the current RequestAction
+func (ara *RASetVariable) GetRAID() ActionID {
+	return RAIDSetARVariable
 }
 
 // Compile is used by Lakshmi
 // Returns the compiled []byte slice of the runtime action
 // To be stored in Redis
-func (ara ARASetVariable) Compile() []byte {
+func (ara RASetVariable) Compile() []byte {
 	b := []byte{}
 	return b
 }
 
 // CreateFrom is used for evaluating the actions in Brahman and followed by Execute
 // This could be put in a single "Execute" but this is less monolothic
-func (ara *ARASetVariable) CreateFrom(bytes []byte) error {
+func (ara *RASetVariable) CreateFrom(bytes []byte) error {
 	return nil
 }
 
-// Execute will mutate the AumMutableRuntimeState in some way
+// Execute will mutate the AIRequest in some way
 // Whether it's the state itself or the OutputSSML
-func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
+func (ara *RASetVariable) Execute(state *AIRequest) {
 	original := state.State.ARVariables[ara.Target].Get()
 	var n interface{}
 	if ara.With.Key != nil {
@@ -464,7 +464,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		if ara.With.ARVariable.T != state.State.ARVariables[ara.Target].T {
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 		newval = n
@@ -477,7 +477,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVOSubtract:
@@ -487,7 +487,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVODivide:
@@ -497,7 +497,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVOModulo:
@@ -507,7 +507,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVONot:
@@ -517,7 +517,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVOInsert:
@@ -531,7 +531,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVODelete:
@@ -543,7 +543,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	case SVOReplace:
@@ -555,7 +555,7 @@ func (ara *ARASetVariable) Execute(state *AumMutableRuntimeState) {
 		default:
 			// TODO: Better error handling here
 			log.SetFlags(log.Llongfile | log.Ltime)
-			log.Fatal("[ERROR] Inavalid type on ARASetVariable Execute")
+			log.Fatal("[ERROR] Inavalid type on RASetVariable Execute")
 			return
 		}
 	}

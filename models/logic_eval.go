@@ -16,18 +16,18 @@ type Result struct {
 
 // Evaluates the byte slice statement
 // Returns an exec id
-func evaluateStatement(state AumMutableRuntimeState, stmt []byte) (key string, eval bool) {
+func evaluateStatement(state AIRequest, stmt []byte) (key string, eval bool) {
 	key = ""
 	eval = false
 
 	return
 }
 
-// LogicLazyEval is used during AUM project user request runtime.
+// LogicLazyEval is used during Talkative project user request runtime.
 // When a request is made in-game, it's routed to the appropriate dialog
 // The dialog has logical blocks attached therein,
 // which yield Redis Keys for respective ActionBundle binaries
-func LogicLazyEval(stateComms chan AumMutableRuntimeState, compiled []byte) <-chan Result {
+func LogicLazyEval(stateComms chan AIRequest, compiled []byte) <-chan Result {
 
 	ch := make(chan Result)
 	go func() {
@@ -70,7 +70,7 @@ func LogicLazyEval(stateComms chan AumMutableRuntimeState, compiled []byte) <-ch
 		}
 
 		awaitNewState := true
-		var state AumMutableRuntimeState
+		var state AIRequest
 
 		for i := 0; i < int(numStatements); i++ {
 			barr, err := r.ReadNBytes(8)

@@ -7,7 +7,7 @@ import (
 	utilities "github.com/talkative-ai/core"
 )
 
-func ActionBundleEval(state *AumMutableRuntimeState, bundle []byte) error {
+func ActionBundleEval(state *AIRequest, bundle []byte) error {
 	var r utilities.ByteReader
 	r.Reader = bytes.NewReader(bundle)
 
@@ -17,7 +17,7 @@ func ActionBundleEval(state *AumMutableRuntimeState, bundle []byte) error {
 			return err
 		}
 		actionID := binary.LittleEndian.Uint64(barr)
-		action := GetActionFromID(AumActionID(actionID))
+		action := GetActionFromID(ActionID(actionID))
 		barr, err = r.ReadNBytes(4)
 		if err != nil {
 			return err

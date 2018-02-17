@@ -28,15 +28,15 @@ type VersionedProject struct {
 	ProjectID   uuid.UUID
 	Version     int64
 	Title       string
-	Category    AumProjectCategory
-	Tags        AumProjectTagArray
+	Category    ProjectCategory
+	Tags        ProjectTagArray
 	ProjectData ProjectItemArray
 	TriggerData ProjectTriggerItemArray
 }
 type ProjectTriggerItem struct {
 	ProjectID   uuid.UUID
 	ZoneID      uuid.UUID
-	TriggerType AumTriggerType
+	TriggerType TriggerType
 	RawLBlock
 }
 

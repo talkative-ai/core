@@ -7,7 +7,7 @@
 Postgres is used for storing relational data for web applications such as the workbench.
 
 ## Redis
-Within the context of Brahman (i.e. running AUM applications) Redis is used for storing commands for compiled AUM applications. These commands can mutate the current user's state within the application and persist their state, or mutate the output of the application.
+Within the context of Brahman (i.e. running Talkative applications) Redis is used for storing commands for compiled Talkative applications. These commands can mutate the current user's state within the application and persist their state, or mutate the output of the application.
 
 # Setup
 1. Install Golang
@@ -25,7 +25,7 @@ Within the context of Brahman (i.e. running AUM applications) Redis is used for 
 
 The services should now be available on the following ports at localhost (127.0.0.1):
 
-*AUM Services*
+*Talkative Services*
 - shiva:8000
 - lakshmi:8042
 - brahman:9001
