@@ -22,9 +22,19 @@ func GetMaxProjects() int {
 // InitializeDB will setup the DB connection
 func InitializeDB() error {
 	var err error
-	Instance, err = sqlx.Connect("postgres", fmt.Sprintf("user=%v password=%v dbname=postgres host=postgres sslmode=disable",
+	port := os.Getenv("POSTGRES_HOST_PORT")
+	if port == "" {
+		port = "5432"
+	}
+	host := os.Getenv("POSTGRES_HOST_ADDR")
+	if host == "" {
+		host = "postgres"
+	}
+	Instance, err = sqlx.Connect("postgres", fmt.Sprintf("user=%v password=%v dbname=postgres host=%v port=%v sslmode=disable",
 		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD")))
+		os.Getenv("POSTGRES_PASSWORD"),
+		host,
+		port))
 	if err != nil {
 		return err
 	}
