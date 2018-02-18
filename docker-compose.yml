@@ -2,7 +2,7 @@ version: "3"
 
 services:
   shiva:
-    image: talkative-shiva
+    image: talkative-shiva-dev
     build:
       dockerfile: Dockerfile-dev
       context: ../shiva
@@ -52,7 +52,7 @@ services:
       ports:
           - 8001:8080
   ganesha:
-    image: talkative-ganesha
+    image: talkative-ganesha-dev
     build:
       dockerfile: Dockerfile-dev
       context: ../ganesha
