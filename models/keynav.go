@@ -5,13 +5,8 @@ import (
 	"fmt"
 )
 
-var KeynavDemoMode bool = false
-
 // compiledNamespaceV1 returns Version 1 of the top level compiled namespace
 func compiledNamespaceV1() string {
-	if KeynavDemoMode {
-		return "c:v1:demo"
-	}
 	return "c:v1"
 }
 

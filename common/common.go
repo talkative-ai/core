@@ -20,14 +20,14 @@ type BSliceIndex struct {
 }
 
 type RedisCommand struct {
-	Exec  func(redis *redis.Client)
+	Exec  func(cmd RedisCommand, redis *redis.Client)
 	Key   string
 	Value interface{}
 }
 
 func RedisSET(key string, bytes []byte) RedisCommand {
-	fn := func(redis *redis.Client) {
-		result := redis.Set(key, bytes, 0)
+	fn := func(cmd RedisCommand, redis *redis.Client) {
+		result := redis.Set(cmd.Key, cmd.Value, 0)
 		if err := result.Err(); err != nil {
 			log.SetFlags(log.Llongfile)
 			log.Println("Redis command error", err.Error())
@@ -41,8 +41,8 @@ func RedisSET(key string, bytes []byte) RedisCommand {
 }
 
 func RedisHSET(key, field string, bytes []byte) RedisCommand {
-	fn := func(redis *redis.Client) {
-		result := redis.HSet(key, field, bytes)
+	fn := func(cmd RedisCommand, redis *redis.Client) {
+		result := redis.HSet(cmd.Key, field, cmd.Value)
 		if err := result.Err(); err != nil {
 			log.SetFlags(log.Llongfile)
 			log.Println("Redis command error", err.Error())
@@ -56,8 +56,8 @@ func RedisHSET(key, field string, bytes []byte) RedisCommand {
 }
 
 func RedisSADD(key string, members ...interface{}) RedisCommand {
-	fn := func(redis *redis.Client) {
-		result := redis.SAdd(key, members...)
+	fn := func(cmd RedisCommand, redis *redis.Client) {
+		result := redis.SAdd(cmd.Key, members...)
 		if err := result.Err(); err != nil {
 			log.SetFlags(log.Llongfile)
 			log.Println("Redis command error", err.Error())
