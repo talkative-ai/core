@@ -90,11 +90,13 @@ type AIRequest struct {
 
 type MutableAIRequestState struct {
 	Zone            uuid.UUID
-	PubID           uuid.UUID
+	ProjectID       uuid.UUID
+	PubID           string
 	CurrentDialog   *string
 	ZoneActors      map[uuid.UUID][]string
 	ZoneInitialized map[uuid.UUID]bool
 	ARVariables     map[string]*ARVariable
+	Demo            bool
 }
 
 type ARVariable struct {
@@ -308,7 +310,7 @@ func (ara *RASetZone) Execute(message *AIRequest) {
 	message.State.ZoneInitialized[message.State.Zone] = true
 
 	res := redis.Instance.HGet(
-		KeynavCompiledTriggersWithinZone(message.State.PubID.String(), ara.String()),
+		KeynavCompiledTriggersWithinZone(message.State.PubID, ara.String()),
 		fmt.Sprintf("%v", TriggerInitializeZone)).Val()
 
 	// There is no initialize trigger
@@ -371,13 +373,13 @@ func (ara *RAResetApp) Execute(message *AIRequest) {
 	message.State.ZoneActors = map[uuid.UUID][]string{}
 	message.State.ZoneInitialized = map[uuid.UUID]bool{}
 	for _, zoneID := range redis.Instance.SMembers(
-		fmt.Sprintf("%v:%v", KeynavProjectMetadataStatic(message.State.PubID.String()), "all_zones")).Val() {
+		fmt.Sprintf("%v:%v", KeynavProjectMetadataStatic(message.State.PubID), "all_zones")).Val() {
 		zUUID := uuid.FromStringOrNil(zoneID)
 		message.State.ZoneActors[zUUID] =
-			redis.Instance.SMembers(KeynavCompiledActorsWithinZone(message.State.PubID.String(), zoneID)).Val()
+			redis.Instance.SMembers(KeynavCompiledActorsWithinZone(message.State.PubID, zoneID)).Val()
 		message.State.ZoneInitialized[zUUID] = false
 	}
-	zoneID := redis.Instance.HGet(KeynavProjectMetadataStatic(message.State.PubID.String()), "start_zone_id").Val()
+	zoneID := redis.Instance.HGet(KeynavProjectMetadataStatic(message.State.PubID), "start_zone_id").Val()
 	setZone := RASetZone(uuid.FromStringOrNil(zoneID))
 	setZone.Execute(message)
 }

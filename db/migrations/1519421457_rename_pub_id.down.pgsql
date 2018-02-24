@@ -1,0 +1,1 @@
+ALTER TABLE event_user_action RENAME COLUMN "ProjectID" TO "PubID"
