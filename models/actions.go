@@ -89,6 +89,7 @@ type AIRequest struct {
 }
 
 type MutableAIRequestState struct {
+	SessionID       uuid.UUID
 	Zone            uuid.UUID
 	ProjectID       uuid.UUID
 	PubID           string
