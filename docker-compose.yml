@@ -1,6 +1,26 @@
 version: "3"
 
 services:
+  kalidasa:
+    image: talkative-kalidasa-dev
+    build:
+      dockerfile: dev.Dockerfile
+      context: $TALKATIVEPATH/kalidasa
+    ports:
+      - 9002:8080
+    depends_on:
+      - "redis"
+  vishnu:
+    image: talkative-vishnu-dev
+    build:
+      dockerfile: dev.Dockerfile
+      context: $TALKATIVEPATH/vishnu
+    ports:
+      - 8043:8080
+    depends_on:
+      - "redis"
+    volumes:
+      - $TALKATIVEPATH/vishnu:/main:ro
   shiva:
     image: talkative-shiva-dev
     build:
@@ -60,7 +80,7 @@ services:
       - $GOPATH:/go:ro
       - ../ganesha:/go/src/github.com/talkative-ai/ganesha:ro
     ports:
-      - 9002:8080
+      - 10000:8080
     depends_on:
       - "postgres"
     env_file:

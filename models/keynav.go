@@ -10,6 +10,11 @@ func compiledNamespaceV1() string {
 	return "c:v1"
 }
 
+// compiledNamespaceV2 returns Version 2 of the top level compiled namespace
+func compiledNamespaceV2() string {
+	return "c:v2"
+}
+
 // KeynavCompiledEntity generates the key for an entity following the standard pattern
 // Because all this data is stored in memory, character count is kept to a bare minimum
 // And many terms are severely truncated
@@ -27,7 +32,7 @@ func compiledNamespaceV1() string {
 // Subentities may exist, and would therefore append to all of this in the same pattern,
 // starting with [data_type] etc. etc.
 func KeynavCompiledEntity(pubID string, entityID AEID, uniqueID string) string {
-	return fmt.Sprintf("%v:%v:e:%v:%v", compiledNamespaceV1(), pubID, entityID, uniqueID)
+	return fmt.Sprintf("%v:%v:e:%v:%v", compiledNamespaceV2(), pubID, entityID, uniqueID)
 }
 
 // KeynavCompiledDialogRootWithinActor generates the key for a dialog root node within a actor
@@ -64,7 +69,7 @@ func KeynavCompiledDialogNodeActionBundle(pubID, dialogID string, bundleID uint6
 // Static means these values are not updated after published.
 func KeynavProjectMetadataStatic(pubID string) string {
 	return fmt.Sprintf("%v:%v:m:s",
-		compiledNamespaceV1(),
+		compiledNamespaceV2(),
 		pubID)
 }
 
@@ -72,14 +77,14 @@ func KeynavProjectMetadataStatic(pubID string) string {
 // Dynamic means these values may be updated after published.
 func KeynavProjectMetadataDynamic(pubID string) string {
 	return fmt.Sprintf("%v:%v:m:d",
-		compiledNamespaceV1(),
+		compiledNamespaceV2(),
 		pubID)
 }
 
 // KeynavGlobalMetaProjects generates the key to access the hash of all published projects
 // Mapping project name to project ID
 func KeynavGlobalMetaProjects() string {
-	return fmt.Sprintf("%v:live:projects", compiledNamespaceV1())
+	return fmt.Sprintf("%v:live:projects", compiledNamespaceV2())
 }
 
 // KeynavParseFromKeyBundleID TODO: Consider if this can be helpful for event sourcing
