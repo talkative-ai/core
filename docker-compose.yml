@@ -7,7 +7,7 @@ services:
       dockerfile: dev.Dockerfile
       context: $TALKATIVEPATH/kalidasa
     ports:
-      - 9002:8080
+      - 8043:8080
     depends_on:
       - "redis"
   vishnu:
@@ -16,9 +16,7 @@ services:
       dockerfile: dev.Dockerfile
       context: $TALKATIVEPATH/vishnu
     ports:
-      - 8043:8080
-    depends_on:
-      - "redis"
+      - 9002:8080
     volumes:
       - $TALKATIVEPATH/vishnu:/main:ro
   shiva:
