@@ -99,6 +99,7 @@ type MutableAIRequestState struct {
 	ARVariables      map[string]*ARVariable
 	Demo             bool
 	RestartRequested bool
+	PreviousResponse string
 }
 
 type ARVariable struct {
