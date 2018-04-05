@@ -44,25 +44,23 @@ func KeynavCompiledDialogRootWithinActor(pubID, actorID string) string {
 
 // KeynavCompiledDialogNodeUnknownWithinActor generates the key for the unknown handler for a
 // respective dialog node.
-func KeynavCompiledDialogNodeUnknownWithinActor(pubID, actorID, parentDialogID string) string {
-	return fmt.Sprintf("%v:e:%v:%v:i:u",
-		KeynavCompiledEntity(pubID, AEIDActor, actorID),
-		AEIDDialogNode, parentDialogID)
+func KeynavCompiledDialogNodeUnknown(pubID, parentDialogID string) string {
+	return fmt.Sprintf("%v:%v:e:%v:%v:u", compiledNamespaceV2,
+		pubID, AEIDDialogNode, parentDialogID)
 }
 
 // KeynavCompiledDialogRootUnknownWithinActor generates the key for the unknown handler for
 // the root level dialogs with respect to the actor.
 func KeynavCompiledDialogRootUnknownWithinActor(pubID, actorID string) string {
-	return fmt.Sprintf("%v:e:%v:i:u",
+	return fmt.Sprintf("%v:e:%v:u",
 		KeynavCompiledEntity(pubID, AEIDActor, actorID),
 		AEIDDialogNode)
 }
 
 // KeynavCompiledDialogNodeWithinActor generates the key for a dialog node within a actor
-func KeynavCompiledDialogNodeWithinActor(pubID, actorID, parentDialogID string) string {
-	return fmt.Sprintf("%v:e:%v:%v:i",
-		KeynavCompiledEntity(pubID, AEIDActor, actorID),
-		AEIDDialogNode, parentDialogID)
+func KeynavCompiledDialogNode(pubID, parentDialogID string) string {
+	return fmt.Sprintf("%v:%v:e:%v:%v:i", compiledNamespaceV2,
+		pubID, AEIDDialogNode, parentDialogID)
 }
 
 func KeynavCompiledActorsWithinZone(pubID, zoneID string) string {

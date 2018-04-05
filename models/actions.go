@@ -89,15 +89,16 @@ type AIRequest struct {
 }
 
 type MutableAIRequestState struct {
-	SessionID       uuid.UUID
-	Zone            uuid.UUID
-	ProjectID       uuid.UUID
-	PubID           string
-	CurrentDialog   *string
-	ZoneActors      map[uuid.UUID][]string
-	ZoneInitialized map[uuid.UUID]bool
-	ARVariables     map[string]*ARVariable
-	Demo            bool
+	SessionID        uuid.UUID
+	Zone             uuid.UUID
+	ProjectID        uuid.UUID
+	PubID            string
+	CurrentDialog    *string
+	ZoneActors       map[uuid.UUID][]string
+	ZoneInitialized  map[uuid.UUID]bool
+	ARVariables      map[string]*ARVariable
+	Demo             bool
+	RestartRequested bool
 }
 
 type ARVariable struct {
