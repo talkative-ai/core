@@ -11,7 +11,7 @@ const compiledNamespaceV1 string = "c:v1"
 // compiledNamespaceV2 returns Version 2 of the top level compiled namespace
 const compiledNamespaceV2 string = "c:v2"
 
-const contextNamespaceV1 string = "x"
+const contextNamespaceV1 string = "d:x"
 
 // KeynavCompiledEntity generates the key for an entity following the standard pattern
 // Because all this data is stored in memory, character count is kept to a bare minimum
@@ -124,10 +124,9 @@ func KeynavCompiledTriggersWithinZone(pubID, zoneID string) string {
 		AEIDTrigger)
 }
 
-func KeynavContextConversation(userID, conversationID string) string {
-	return fmt.Sprintf("%v:0:%v:%v",
+func KeynavContextConversation(conversationID string) string {
+	return fmt.Sprintf("%v:0:%v",
 		contextNamespaceV1,
-		userID,
 		conversationID)
 }
 

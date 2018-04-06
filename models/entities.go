@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -175,7 +177,13 @@ func (a *DialogNode) Scan(src interface{}) error {
 type DialogInput string
 
 func (input DialogInput) Prepared() string {
-	return string(input)
+	reg, err := regexp.Compile("[^a-zA-Z0-9 ]+")
+	if err != nil {
+		log.Fatal(err)
+		return string(input)
+	}
+	processedString := reg.ReplaceAllString(string(input), "")
+	return processedString
 }
 
 const (
